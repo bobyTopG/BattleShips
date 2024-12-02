@@ -24,44 +24,50 @@ public class Board {
 
 
     public void generateShips() {
-
         Random rand = new Random();
-        boolean isCreated = false;
         int size = rand.nextInt(2, 5); // Ship size between 2 and 4 tiles
+        boolean isCreated = false;
 
         while (!isCreated) {
-            boolean isVertical = rand.nextBoolean(); // Randomly choose orientation
-            int startX, startY;
+            boolean isVertical = rand.nextBoolean();
+            int startX = rand.nextInt(boardSize - size + 1);
+            int startY = rand.nextInt(boardSize - size + 1);
 
-            if (isVertical) {
-                // Ensure vertical placement avoids top and bottom boundaries
-                startX = rand.nextInt(boardSize - 2 - size) + 1; // Between 1 and boardSize - size - 1
-                startY = rand.nextInt(boardSize - 2) + 1; // Between 1 and boardSize - 2
-            } else {
-                // Ensure horizontal placement avoids left and right boundaries
-                startX = rand.nextInt(boardSize - 2) + 1; // Between 1 and boardSize - 2
-                startY = rand.nextInt(boardSize - 2 - size) + 1; // Between 1 and boardSize - size - 1
-            }
-
-            // Check if the ship can be placed without overlap
             boolean canPlace = true;
-            for (int i = 0; i < size; i++) {
-                int x = isVertical ? startX + i : startX;
-                int y = isVertical ? startY : startY + i;
 
-                if (tiles[x][y] == '□') {
+            // Check if the ship can be placed without overlapping or touching other ships
+            for (int i = 0; i < size; i++) {
+                int cx = isVertical ? startX + i : startX;
+                int cy = isVertical ? startY : startY + i;
+
+                if (tiles[cx][cy] == '□') {
                     canPlace = false;
                     break;
                 }
+
+                // Check surrounding tiles to ensure no touching
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        int adjX = cx + dx;
+                        int adjY = cy + dy;
+                        if (adjX >= 0 && adjX < boardSize && adjY >= 0 && adjY < boardSize) {
+                            if (tiles[adjX][adjY] == '□') {
+                                canPlace = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (!canPlace) break;
+                }
+                if (!canPlace) break;
             }
 
-            // Place the ship if there's no overlap
+            // Place the ship if there's no overlap and no touching
             if (canPlace) {
                 for (int i = 0; i < size; i++) {
-                    int x = isVertical ? startX + i : startX;
-                    int y = isVertical ? startY : startY + i;
-
-                    tiles[x][y] = '□';
+                    int cx = isVertical ? startX + i : startX;
+                    int cy = isVertical ? startY : startY + i;
+                    tiles[cx][cy] = '□';
                 }
                 isCreated = true;
             }
@@ -78,50 +84,60 @@ public class Board {
     public String generateTiles() {
         StringBuilder sb = new StringBuilder();
 
-        // Calculate the total width of the grid including the column numbers and boundaries
-        int totalWidth = (boardSize * 3) + 4; // Each tile has 3 spaces and there's 4 spaces for borders (left, right, and between)
+        Random rand = new Random();
+        int placed = 0;
 
-        // Add column numbers (start from 1) for the top row, excluding boundaries
-        sb.append("    "); // Adjust for spacing to align the column numbers
+
+        while (placed < 15) {
+            int x = rand.nextInt(boardSize);
+            int y = rand.nextInt(boardSize);
+
+            // Only place a hint if it's not already a hint or ship
+            if (tiles[x][y] != '□' && tiles[x][y] != '~') {
+                tiles[x][y] = '~';  // Place the hint tile (~)
+                placed++;
+            }
+        }
+
+        // Add column numbers
+        sb.append("    ");
         for (int col = 1; col <= boardSize; col++) {
-            sb.append(String.format("%2d ", col)); // Format the column numbers
+            sb.append(String.format("%2d ", col));
         }
         sb.append("\n");
 
-        // Add the top boundary row (fully extended with boundaries)
+        // Add top border
         sb.append("   ");
         for (int i = 0; i < boardSize; i++) {
-            sb.append("- -"); // Add hyphens for the boundary
+            sb.append("- -");
         }
-        sb.append(" -\n"); // Add extra space for the right boundary
+        sb.append(" -\n");
 
-        // Generate the board with row numbers (start from 0)
-        for (int i = 0; i < boardSize; i++) {  // Start from 0 for rows
-            sb.append(String.format("%2d |", i + 1)); // Row number for grid, with left boundary
-
-            // Add the grid tiles
-            for (int j = 0; j < boardSize; j++) { // Start from 0 for columns
-                if (tiles[i][j] != '□') {
-                    sb.append(" # ");  // Add water tile for non-ship positions
+        // Add grid with tiles and hints
+        for (int i = 0; i < boardSize; i++) {
+            sb.append(String.format("%2d |", i + 1)); // Row number
+            for (int j = 0; j < boardSize; j++) {
+                // Display the ship (□), hint (~), or water (#)
+                if (tiles[i][j] == '□') {
+                    sb.append(" □ "); // Ship part
+                } else if (tiles[i][j] == '~') {
+                    sb.append(" ~ "); // Hint part
                 } else {
-                    sb.append(" □ ");  // Add ship part
+                    sb.append(" # "); // Water part
                 }
             }
-
-            sb.append("|");  // Right boundary
-            sb.append("\n");
+            sb.append("|\n");
         }
 
-        // Add the bottom boundary row (fully extended with boundaries)
+        // Add bottom border
         sb.append("   ");
         for (int i = 0; i < boardSize; i++) {
-            sb.append("- -"); // Add hyphens for the boundary
+            sb.append("- -");
         }
-        sb.append(" -\n"); // Add extra space for the right boundary
+        sb.append(" -\n");
 
         return sb.toString();
     }
-
 
 
 
@@ -177,9 +193,9 @@ public class Board {
 
 
         // Placing 3 ships on the board
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             generateShips();
-        }
+        };
 
         sb.append(generateTiles());
 
