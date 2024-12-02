@@ -76,22 +76,52 @@ public class Board {
     ;
 
     public String generateTiles() {
-
         StringBuilder sb = new StringBuilder();
+
+        // Calculate the total width of the grid including the column numbers and boundaries
+        int totalWidth = (boardSize * 3) + 4; // Each tile has 3 spaces and there's 4 spaces for borders (left, right, and between)
+
+        // Add column numbers (start from 1) for the top row, excluding boundaries
+        sb.append("    "); // Adjust for spacing to align the column numbers
+        for (int col = 1; col <= boardSize; col++) {
+            sb.append(String.format("%2d ", col)); // Format the column numbers
+        }
+        sb.append("\n");
+
+        // Add the top boundary row (fully extended with boundaries)
+        sb.append("   ");
         for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                if (i == 0 || i == boardSize - 1) {
-                    tiles[i][j] = '-'; // Top and bottom boundaries
-                } else if (j == 0 || j == boardSize - 1) {
-                    tiles[i][j] = '|'; // Left and right boundaries
+            sb.append("- -"); // Add hyphens for the boundary
+        }
+        sb.append(" -\n"); // Add extra space for the right boundary
+
+        // Generate the board with row numbers (start from 0)
+        for (int i = 0; i < boardSize; i++) {  // Start from 0 for rows
+            sb.append(String.format("%2d |", i + 1)); // Row number for grid, with left boundary
+
+            // Add the grid tiles
+            for (int j = 0; j < boardSize; j++) { // Start from 0 for columns
+                if (tiles[i][j] != '□') {
+                    sb.append(" # ");  // Add water tile for non-ship positions
                 } else {
-                    tiles[i][j] = '~'; // Water tiles
+                    sb.append(" □ ");  // Add ship part
                 }
             }
 
+            sb.append("|");  // Right boundary
+            sb.append("\n");
         }
+
+        // Add the bottom boundary row (fully extended with boundaries)
+        sb.append("   ");
+        for (int i = 0; i < boardSize; i++) {
+            sb.append("- -"); // Add hyphens for the boundary
+        }
+        sb.append(" -\n"); // Add extra space for the right boundary
+
         return sb.toString();
     }
+
 
 
 
@@ -144,21 +174,15 @@ public class Board {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(generateTiles());
+
 
         // Placing 3 ships on the board
         for (int i = 0; i < 3; i++) {
             generateShips();
         }
 
+        sb.append(generateTiles());
 
-
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                sb.append(tiles[i][j]).append(" ");
-            }
-            sb.append("\n");
-        }
         return sb.toString();
 
     }
