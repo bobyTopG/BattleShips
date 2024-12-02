@@ -25,7 +25,6 @@ public class Board {
 
     public void generateShips() {
 
-
         Random rand = new Random();
         boolean isVertical = rand.nextBoolean();
         boolean isOneTile = rand.nextBoolean();
@@ -34,17 +33,15 @@ public class Board {
 
         while (!isCreated) {
             if (isOneTile) {
-                int x = rand.nextInt(
-                        boardSize);
-                int y = rand.nextInt(
-                        boardSize);
-                tiles[x][y] = '□';
-                isCreated = true;
+                if (boardSize != 0) {
+                    int x = rand.nextInt(boardSize);
+                    int y = rand.nextInt(boardSize);
+                    tiles[x][y] = '□';
+                    isCreated = true;
+                }
             } else if (isVertical) {
-                int x = rand.nextInt(
-                        boardSize);
-                if (x + 5 <
-                        boardSize || x - 5 > 0) {
+                int x = rand.nextInt(boardSize);
+                if (x + size < boardSize && x - size > 0) {
                     int y = 0;
                     for (int i = 0; i < size; i++) {
                         y += rand.nextBoolean() ? 1 : -1;
@@ -53,11 +50,9 @@ public class Board {
                     isCreated = true;
                 }
 
-            } else if (!isVertical) {
-                int y = rand.nextInt(
-                        boardSize);
-                if (y + 5 <
-                        boardSize || y - 5 > 0) {
+            } else {
+                int y = rand.nextInt(boardSize);
+                if (y + size < boardSize && y - size > 0) {
                     int x = 0;
                     for (int i = 0; i < size; i++) {
                         x += rand.nextBoolean() ? 1 : -1;
