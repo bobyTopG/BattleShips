@@ -1,11 +1,22 @@
 package be.kdg.integration1.battleships_solitaire;
 
+import java.sql.Timestamp;
+
 public class Board {
 
     private int boardSize;
+    private int score;
+    private Timestamp start;
+    private Timestamp end;
+    private int duration;
 
-    public Board(int boardSize) {
+
+    public Board(int boardSize, int score, Timestamp start, Timestamp end, int duration) {
         this.boardSize = boardSize;
+        this.score = score;
+        this.start = start;
+        this.end = end;
+        this.duration = duration;
     }
 
     public void generateShips(){};
@@ -24,6 +35,10 @@ public class Board {
         return false;
     };
 
+    public int getBoardSize() {
+        return boardSize;
+    }
+
     public boolean isCorrect(){
         return false;
     }
@@ -35,7 +50,12 @@ public class Board {
                 '}';
     }
 }
+
 //-boardSize: int
+//-score: int
+//-start: Timestamp
+//-end: Timestamp
+//-duration:
 
 //+«create»(int)
 //+generateShips()

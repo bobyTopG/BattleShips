@@ -16,6 +16,8 @@ public class GameController {
 
     public void loadGame(){}
 
+    public void loadPlayer(Player player){}
+
     public void loadLeaderBoard(){}
 
     public void markTile(){}
