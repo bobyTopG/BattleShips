@@ -19,6 +19,10 @@ public class Tile {
     public int getY() {
         return y;
     }
+
+    public boolean isShip() {
+        return isShip;
+    }
 }
 
 //+«create»(int ,int)

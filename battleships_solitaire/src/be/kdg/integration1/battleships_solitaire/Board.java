@@ -70,35 +70,67 @@ public class Board {
 
 
     public void getRandomShip() {
+
     }
 
     ;
 
-    public void generateTiles() {
+    public String generateTiles() {
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (i == 0 || i == boardSize - 1) {
+                    tiles[i][j] = '-'; // Top and bottom boundaries
+                } else if (j == 0 || j == boardSize - 1) {
+                    tiles[i][j] = '|'; // Left and right boundaries
+                } else {
+                    tiles[i][j] = '~'; // Water tiles
+                }
+            }
+
+        }
+        return sb.toString();
     }
 
-    ;
 
-    public void revealTile() {
+
+    public void revealTile(int x, int y) {
+
+            if (tiles[x][y] == '□') {
+                System.out.println("Hit!");
+                tiles[x][y] = 'X';
+            } else if (tiles[x][y] == '~') {
+                System.out.println("Miss.");
+                tiles[x][y] = 'O';
+            } else {
+                System.out.println("Already revealed.");
+            }
     }
 
-    ;
 
-    public void correctTile() {
+
+    public void correctTile(int x, int y) {
+        if (tiles[x][y] == '□') {
+            System.out.println("Removing ship part...");
+            tiles[x][y] = '~';
+        } else {
+            System.out.println("No correction needed.");
+        }
     }
 
-    ;
+
 
     public void updateTile(Tile tile) {
+
     }
 
-    ;
+
 
     public boolean isFullyMarked() {
         return false;
     }
 
-    ;
 
     public int getBoardSize() {
         return boardSize;
@@ -112,24 +144,13 @@ public class Board {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                if (i == 0 || i == boardSize - 1) {
-                    tiles[i][j] = '-';
-                } else if (j == 0 || j == boardSize - 1) {
-                    tiles[i][j] = '|';
-                } else {
-                    tiles[i][j] = '~';
-
-                }
-
-            }
-        }
+        sb.append(generateTiles());
 
         // Placing 3 ships on the board
         for (int i = 0; i < 3; i++) {
             generateShips();
         }
+
 
 
         for (int i = 0; i < boardSize; i++) {
