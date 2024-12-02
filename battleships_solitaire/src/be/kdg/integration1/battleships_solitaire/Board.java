@@ -26,47 +26,48 @@ public class Board {
     public void generateShips() {
 
         Random rand = new Random();
-        boolean isVertical = rand.nextBoolean();
-        boolean isOneTile = rand.nextBoolean();
-        int size = rand.nextInt(2, 5);
         boolean isCreated = false;
+        int size = rand.nextInt(2, 5); // Ship size between 2 and 4 tiles
 
         while (!isCreated) {
-            if (isOneTile) {
-                if (boardSize != 0) {
-                    int x = rand.nextInt(boardSize);
-                    int y = rand.nextInt(boardSize);
-                    tiles[x][y] = '□';
-                    isCreated = true;
-                }
-            } else if (isVertical) {
-                int x = rand.nextInt(boardSize);
-                if (x + size < boardSize && x - size > 0) {
-                    int y = 0;
-                    for (int i = 0; i < size; i++) {
-                        y += rand.nextBoolean() ? 1 : -1;
-                        tiles[x][y] = '□';
-                    }
-                    isCreated = true;
-                }
+            boolean isVertical = rand.nextBoolean(); // Randomly choose orientation
+            int startX, startY;
 
+            if (isVertical) {
+                // Ensure vertical placement avoids top and bottom boundaries
+                startX = rand.nextInt(boardSize - 2 - size) + 1; // Between 1 and boardSize - size - 1
+                startY = rand.nextInt(boardSize - 2) + 1; // Between 1 and boardSize - 2
             } else {
-                int y = rand.nextInt(boardSize);
-                if (y + size < boardSize && y - size > 0) {
-                    int x = 0;
-                    for (int i = 0; i < size; i++) {
-                        x += rand.nextBoolean() ? 1 : -1;
-                        tiles[x][y] = '□';
-                    }
-                    isCreated = true;
+                // Ensure horizontal placement avoids left and right boundaries
+                startX = rand.nextInt(boardSize - 2) + 1; // Between 1 and boardSize - 2
+                startY = rand.nextInt(boardSize - 2 - size) + 1; // Between 1 and boardSize - size - 1
+            }
+
+            // Check if the ship can be placed without overlap
+            boolean canPlace = true;
+            for (int i = 0; i < size; i++) {
+                int x = isVertical ? startX + i : startX;
+                int y = isVertical ? startY : startY + i;
+
+                if (tiles[x][y] == '□') {
+                    canPlace = false;
+                    break;
                 }
             }
+
+            // Place the ship if there's no overlap
+            if (canPlace) {
+                for (int i = 0; i < size; i++) {
+                    int x = isVertical ? startX + i : startX;
+                    int y = isVertical ? startY : startY + i;
+
+                    tiles[x][y] = '□';
+                }
+                isCreated = true;
+            }
         }
-
-
     }
 
-    ;
 
     public void getRandomShip() {
     }
@@ -125,7 +126,11 @@ public class Board {
             }
         }
 
-        generateShips();
+        // Placing 3 ships on the board
+        for (int i = 0; i < 3; i++) {
+            generateShips();
+        }
+
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
