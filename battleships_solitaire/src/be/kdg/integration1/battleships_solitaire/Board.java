@@ -117,7 +117,6 @@ public class Board {
         for (int i = 0; i < boardSize; i++) {
             sb.append(String.format("%2d |", i + 1)); // Row number
             for (int j = 0; j < boardSize; j++) {
-                // Display the ship (□), hint (~), or water (#)
                 if (tiles[i][j] == '□') {
                     sb.append(" □ "); // Ship part
                 } else if (tiles[i][j] == '~') {
