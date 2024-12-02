@@ -81,66 +81,64 @@ public class Board {
 
     ;
 
-    public String generateTiles() {
-        StringBuilder sb = new StringBuilder();
 
-        Random rand = new Random();
-        int placed = 0;
+        public String generateTiles() {
+            StringBuilder sb = new StringBuilder();
 
-
-        while (placed < 15) {
-            int x = rand.nextInt(boardSize);
-            int y = rand.nextInt(boardSize);
-
-            // Only place a hint if it's not already a hint or ship
-            if (tiles[x][y] != '□' && tiles[x][y] != '~') {
-                tiles[x][y] = '~';  // Place the hint tile (~)
-                placed++;
+            // Add column numbers
+            sb.append("    ");
+            for (int col = 1; col <= boardSize; col++) {
+                sb.append(String.format("%2d ", col)); // Column numbers
             }
-        }
+            sb.append("\n");
+            sb.append("   ");
+            for (int i = 0; i < boardSize; i++) {
+                sb.append("- -");
+            }
+            sb.append(" -\n");
 
-        // Add column numbers
-        sb.append("    ");
-        for (int col = 1; col <= boardSize; col++) {
-            sb.append(String.format("%2d ", col));
-        }
-        sb.append("\n");
+            // Add grid with tiles and ship counts per row
+            for (int i = 0; i < boardSize; i++) {
+                int rowShipCount = 0; // To store the number of ships in the current row
+                sb.append(String.format("%2d |", i + 1)); // Row number
 
-        // Add top border
-        sb.append("   ");
-        for (int i = 0; i < boardSize; i++) {
-            sb.append("- -");
-        }
-        sb.append(" -\n");
-
-        // Add grid with tiles and hints
-        for (int i = 0; i < boardSize; i++) {
-            sb.append(String.format("%2d |", i + 1)); // Row number
-            for (int j = 0; j < boardSize; j++) {
-                if (tiles[i][j] == '□') {
-                    sb.append(" □ "); // Ship part
-                } else if (tiles[i][j] == '~') {
-                    sb.append(" ~ "); // Hint part
-                } else {
-                    sb.append(" # "); // Water part
+                for (int j = 0; j < boardSize; j++) {
+                    // Count the ships in this row
+                    if (tiles[i][j] == '□') {
+                        rowShipCount++;
+                    }
+                    sb.append(tiles[i][j] == '□' ? " □ " : " # ");
                 }
+
+                sb.append("| " + rowShipCount); // Add the ship count for the current row
+                sb.append("\n");
             }
-            sb.append("|\n");
+
+            // Add bottom border
+            sb.append("   ");
+            for (int i = 0; i < boardSize; i++) {
+                sb.append("- -");
+            }
+            sb.append(" -\n");
+
+            // Add column ship count
+            sb.append("   ");
+            for (int j = 0; j < boardSize; j++) {
+                int colShipCount = 0;
+                for (int i = 0; i < boardSize; i++) {
+                    if (tiles[i][j] == '□') {
+                        colShipCount++;
+                    }
+                }
+                sb.append(String.format("%2d ", colShipCount)); // Ship count for each column
+            }
+            sb.append("\n");
+
+            return sb.toString();
         }
 
-        // Add bottom border
-        sb.append("   ");
-        for (int i = 0; i < boardSize; i++) {
-            sb.append("- -");
-        }
-        sb.append(" -\n");
 
-        return sb.toString();
-    }
-
-
-
-    public void revealTile(int x, int y) {
+        public void revealTile(int x, int y) {
 
             if (tiles[x][y] == '□') {
                 System.out.println("Hit!");
