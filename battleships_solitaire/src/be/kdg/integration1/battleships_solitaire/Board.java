@@ -1,4 +1,4 @@
-package be.kdg.integration1.battleships_solitaire.scripts;
+package be.kdg.integration1.battleships_solitaire;
 
 public class Board {
 
