@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS games (
     player_id INTEGER
         CONSTRAINT nn_player_id NOT NULL
         CONSTRAINT fk_player_id REFERENCES games(game_id)
-        ON DELETE SET NULL
+        ON DELETE CASCADE
 );
 
 /* Creating the TILES table */
@@ -79,17 +79,19 @@ CREATE TABLE IF NOT EXISTS ships (
     ship_type_id INTEGER
         CONSTRAINT nn_ship_type_id NOT NULL
         CONSTRAINT fk_ship_type_id REFERENCES ship_types(ship_type_id)
-        ON DELETE SET NULL
+            ON DELETE SET NULL
 );
 
 /* Creating the PLACEMENTS table */
 CREATE TABLE IF NOT EXISTS placements (
     game_id INTEGER
         CONSTRAINT nn_placement_game_id NOT NULL
-        CONSTRAINT fk_game_id REFERENCES games(game_id),
+        CONSTRAINT fk_game_id REFERENCES games(game_id)
+            ON DELETE CASCADE,
     ship_id INTEGER
         CONSTRAINT nn_placement_ship_id NOT NULL
-        CONSTRAINT fk_ship_id REFERENCES ships(ship_id),
+        CONSTRAINT fk_ship_id REFERENCES ships(ship_id)
+            ON DELETE CASCADE,
     x NUMERIC(2)
         CONSTRAINT nn_ship_x NOT NULL,
     y NUMERIC(2)
