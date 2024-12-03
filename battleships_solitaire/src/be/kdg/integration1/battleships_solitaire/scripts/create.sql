@@ -1,5 +1,5 @@
 /* Dropping the database and the tables if they already exist */
--- DROP DATABASE IF EXISTS battleships;
+-- DROP DATABASE IF EXISTS ascii2;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE IF EXISTS games CASCADE;
 DROP TABLE IF EXISTS tiles CASCADE;
@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS ships CASCADE;
 DROP TABLE IF EXISTS placements CASCADE;
 
 /* Creating the database */
--- CREATE DATABASE battleships;
+-- CREATE DATABASE ascii2;
 
 /* Creating the PLAYERS table */
 CREATE TABLE IF NOT EXISTS players (
@@ -19,7 +19,12 @@ CREATE TABLE IF NOT EXISTS players (
         CONSTRAINT nn_player_name NOT NULL
         CONSTRAINT uq_player_name UNIQUE
         CONSTRAINT ch_player_name
-            CHECK ( name = UPPER(name) )
+            CHECK ( name = UPPER(name) ),
+    birthdate DATE
+        CONSTRAINT nn_birthdate NOT NULL,
+    join_date DATE
+        CONSTRAINT nn_join_date NOT NULL
+        DEFAULT CURRENT_DATE
 );
 
 /* Creating the GAMES table */
