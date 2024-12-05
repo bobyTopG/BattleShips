@@ -5,8 +5,8 @@ public class Game {
     private GameController gameController;
 
     public void start() {
-        GameController gameController = new GameController()
-        gameController.startGame();
+        Board board = new Board(10 , 5 , 1);
+        System.out.println(board.toString());
     }
 
 }
