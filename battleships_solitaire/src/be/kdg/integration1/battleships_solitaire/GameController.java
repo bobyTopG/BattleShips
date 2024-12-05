@@ -4,6 +4,11 @@ import java.util.Scanner;
 
 public class GameController {
 
+    private LeaderBoard leaderBoard;
+    private Board board;
+    private Player player;
+    private PersistenceController persistenceController;
+
     //Constructor
     public GameController() {}
 
