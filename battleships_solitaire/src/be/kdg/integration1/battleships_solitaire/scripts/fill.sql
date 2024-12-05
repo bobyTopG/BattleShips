@@ -1,105 +1,21 @@
 /* Adding example data to the players table */
-INSERT INTO players (name, birthdate)
-VALUES ('VIVIAN', TO_DATE('12-03-45', 'DD-MM-YY')),
-       ('BOYAN', TO_DATE('06-07-89', 'DD-MM-YY')),
-       ('ALUN', TO_DATE('10-11-12', 'DD-MM-YY'));
+INSERT INTO players (name)
+VALUES ('VIVIAN'),
+       ('BOYAN'),
+       ('ALUN');
 
 /* Adding data for 2 example games */
-INSERT INTO games (player_id,
-                   board_size, score,
-                   start, duration)
-VALUES ((SELECT player_id
-         FROM players
-         WHERE name = 'VIVIAN'),
-        7, 10,
-        NOW(), '5 minutes'),
-       ((SELECT player_id
-         FROM players
-         WHERE name = 'BOYAN'),
-        5, 123,
-        NOW(), '2 hours ');
+INSERT INTO games (player_id, board_size, score, start, duration)
+VALUES ((SELECT player_id FROM players WHERE name = 'VIVIAN'), 7, 10, NOW(), '5 mins'),
+       ((SELECT player_id FROM players WHERE name = 'BOYAN'), 5, 123, NOW(), '2 hours ');
 
 /* Setting the end of a game */
-UPDATE games
-SET "end" = NOW() + '2 hours'
-WHERE player_id = (SELECT player_id
-                   FROM players
-                   WHERE name = 'BOYAN');
+UPDATE games SET "end" = NOW() + '2 hours' WHERE player_id = (SELECT player_id FROM players WHERE name = 'BOYAN');
 
-/* Creating an example board of tiles for a game */
-INSERT INTO tiles (x, y, is_ship, game_id)
-VALUES (1, 'A', FALSE, 1),
-       (2, 'A', FALSE, 1),
-       (3, 'A', FALSE, 1),
-       (4, 'A', FALSE, 1),
-       (5, 'A', FALSE, 1),
-       (6, 'A', FALSE, 1),
-       (7, 'A', FALSE, 1),
-       (1, 'B', FALSE, 1),
-       (2, 'B', TRUE, 1),
-       (3, 'B', FALSE, 1),
-       (4, 'B', TRUE, 1),
-       (5, 'B', FALSE, 1),
-       (6, 'B', TRUE, 1),
-       (7, 'B', FALSE, 1),
-       (1, 'C', FALSE, 1),
-       (2, 'C', TRUE, 1),
-       (3, 'C', FALSE, 1),
-       (4, 'C', FALSE, 1),
-       (5, 'C', FALSE, 1),
-       (6, 'C', TRUE, 1),
-       (7, 'C', FALSE, 1),
-       (1, 'D', FALSE, 1),
-       (2, 'D', TRUE, 1),
-       (3, 'D', FALSE, 1),
-       (4, 'D', FALSE, 1),
-       (5, 'D', FALSE, 1),
-       (6, 'D', FALSE, 1),
-       (7, 'D', FALSE, 1),
-       (1, 'E', FALSE, 1),
-       (2, 'E', FALSE, 1),
-       (3, 'E', FALSE, 1),
-       (4, 'E', TRUE, 1),
-       (5, 'E', FALSE, 1),
-       (6, 'E', FALSE, 1),
-       (7, 'E', FALSE, 1),
-       (1, 'F', FALSE, 1),
-       (2, 'F', TRUE, 1),
-       (3, 'F', FALSE, 1),
-       (4, 'F', FALSE, 1),
-       (5, 'F', FALSE, 1),
-       (6, 'F', FALSE, 1),
-       (7, 'F', FALSE, 1),
-       (1, 'G', FALSE, 1),
-       (2, 'G', FALSE, 1),
-       (3, 'G', FALSE, 1),
-       (4, 'G', FALSE, 1),
-       (5, 'G', FALSE, 1),
-       (6, 'G', TRUE, 1),
-       (7, 'G', TRUE, 1);
+/*  */
 
-/* Inserting the ships */
-INSERT INTO ships (ship_type_id)
-VALUES (2),
-       (3),
-       (3),
-       (4),
-       (4),
-       (4);
 
-/* Setting up the ships' placements */
-INSERT INTO placements (game_id, ship_id, x, y, is_vertical)
-VALUES (1, 1, 2, 'B', TRUE),
-       (1, 2, 6, 'B', TRUE),
-       (1, 3, 6, 'G', FALSE),
-       (1, 4, 4, 'B', NULL),
-       (1, 5, 4, 'E', NULL),
-       (1, 6, 2, 'F', NULL);
-
-/* Checking out if all the tables have data */
 SELECT * FROM players;
 SELECT * FROM games;
-SELECT * FROM tiles;
-SELECT * FROM ship_types;
-SELECT * FROM ships;
-SELECT * FROM placements;
+TRUNCATE players RESTART IDENTITY;
+TRUNCATE games RESTART IDENTITY CASCADE;
