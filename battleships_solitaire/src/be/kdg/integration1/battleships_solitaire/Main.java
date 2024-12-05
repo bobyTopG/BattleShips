@@ -4,7 +4,9 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
-       GameController gameController = new GameController();
-       gameController.startGame(4);
+        Board board = new Board(10 , 5 , 1);
+
+        System.out.println(board.toString());
+
     }
 }
