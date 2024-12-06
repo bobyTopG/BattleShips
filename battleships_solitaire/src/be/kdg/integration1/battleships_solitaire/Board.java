@@ -164,6 +164,7 @@ public class Board {
         }
 
     }
+
     public void revealTile() {
         Random rand = new Random();
         int x, y;

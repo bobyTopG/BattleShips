@@ -13,7 +13,7 @@ public class SimpleMenu {
     }
 
     public String help(){
-        return "a - Add Ship / s - Ship To Water / r - Remove Tile\n" +
+        return "a - Add Ship / s - Add Water / r - Remove\n" +
                 "e -  End the game / l - Revile a tile \n\n";
     }
 
