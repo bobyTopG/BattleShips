@@ -33,6 +33,7 @@ public class Board {
 
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
+
                 // Check if ships are in the same positions
                 if (tiles[i][j] == '□' && tilesCopy[i][j] != '□') {
                     return false; // Ship is in array1 but not in array2

@@ -5,6 +5,6 @@ import java.util.Date;
 public class Main {
     public static void main(String[] args) {
        GameController gameController = new GameController();
-       gameController.startGame(4);
+       gameController.startGame(5);
     }
 }
