@@ -5,8 +5,8 @@ import java.util.Random;
 public class Board {
 
     private final int boardSize; //Difficulty!
-    private  char[][] tiles;
-    private  char[][] tilesSolution;
+    private char[][] tiles;
+    private char[][] tilesSolution;
     private SimpleMenu menu;
 
     public Board(int boardSize) {
@@ -83,6 +83,7 @@ public class Board {
                     int cx = isVertical ? startX + i : startX;
                     int cy = isVertical ? startY : startY + i;
                     tiles[cx][cy] = '□';
+                    tilesSolution[cx][cy] = '#';
                 }
                 System.out.println("Ship successfully placed!");
                 break; // Exit loop after successful placement
@@ -95,17 +96,17 @@ public class Board {
     public void generateTiles() {
         System.out.println("Generating Tiles..."); // Debug print
 
-        // Randomly place 6 hint tiles (~)
+        // Randomly place hint tiles (X)
         Random rand = new Random();
         int placed = 0;
-        while (placed < 6) {
+        while (placed < boardSize*1.5) {
             int x = rand.nextInt(boardSize);
             int y = rand.nextInt(boardSize);
 
             // Only place a hint if it's not already a hint or ship
             if (tiles[x][y] == '\0') { // '\0' indicates an uninitialized tile
-                tiles[x][y] = '~';
-                tilesSolution[x][y] = '~';
+                tiles[x][y] = 'X';
+                tilesSolution[x][y] = 'X';
                 placed++;
             }
         }
@@ -116,10 +117,8 @@ public class Board {
                 char tile = tiles[i][j];
 
                 if (tile == '\0') { // Default empty tile
-                    tiles[i][j] = '#';
-                    tilesSolution[i][j] = '#';
-                } else if (tile == '□') { // Ship tile
-                    tilesSolution[i][j] = '#'; // Hide ship in the solution
+                    tiles[i][j] = '~';
+                    tilesSolution[i][j] = '~';
                 }
             }
         }
@@ -135,7 +134,8 @@ public class Board {
         } else if (tilesSolution[x][y] == '~') {
             tilesSolution[x][y] = '□';
             System.out.println("New ship added.");
-            //System.out.println("Hey! This is a hint :)");
+        } else if (tiles[x][y] == 'X') {
+            System.out.println("Hey! This is a hint :)");
         }
     }
 
@@ -148,6 +148,8 @@ public class Board {
         } else if (tilesSolution[x][y] == '□') {
             System.out.println("New water tile added.");
             tilesSolution[x][y] = '~';
+        } else if (tiles[x][y] == 'X') {
+            System.out.println("Hey! This is a hint :)");
         }
     }
 
@@ -158,7 +160,10 @@ public class Board {
         } else if (tilesSolution[x][y] == '~') {
             System.out.println("Removing water tile...");
             tilesSolution[x][y] = '#';
-        } else {
+        }else if (tiles[x][y] == 'X') {
+            System.out.println("Hey! This is a hint :)");
+        }
+        else {
             System.out.println("No correction needed.");
         }
     }
@@ -189,7 +194,7 @@ public class Board {
                 if (tile == '□') rowShipCount++;
 
                 // Append tile to grid
-                sb.append(tile == '□' || tile == '~' ? " " + tile + " " : " # ");
+                sb.append(tile == '□' || tile == 'X' ? " " + tile + " " : " ~ ");
             }
 
             sb.append("| ").append(rowShipCount).append("\n"); // Add row ship count
@@ -234,10 +239,10 @@ public class Board {
             for (int j = 0; j < boardSize; j++) {
                 char tile = tilesSolution[i][j];
 
-                if (tile == '□') rowShipCount++;  // Increment ship count
+                if (tiles[i][j] == '□') rowShipCount++;  // Increment ship count
 
                 // Append tile to the grid
-                sb.append(tile == '□' || tile == '~' ? " " + tile + " " : " # ");
+                sb.append(tile == '#' || tile == 'X' ? " " + tile + " " : " # ");
             }
             sb.append("| ").append(rowShipCount).append("\n");  // Append row ship count
         }

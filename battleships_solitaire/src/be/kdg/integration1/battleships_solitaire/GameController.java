@@ -26,6 +26,7 @@ public class GameController {
 
         startTime = System.currentTimeMillis();
         System.out.println(board);
+        boolean gameEnded = false;
 
         while (!board.isGameOver() && !gameEnded) {
             System.out.print(menu.menuOptions());
