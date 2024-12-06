@@ -1,28 +1,15 @@
 package be.kdg.integration1.battleships_solitaire;
 
 public enum ShipType {
+    DESTROYER(2), SUBMARINE(3), BATTLESHIP(4), CARRIER(5);
 
-    BATTLESHIP(4),
+    private final int size;
 
-    CRUISER(3),
-
-    DESTROYER(2),
-
-    SUBMARINE(1);
-
-    private int shipSize;
-
-     ShipType(int shipSize){
-        this.shipSize = shipSize;
+    ShipType(int size) {
+        this.size = size;
     }
 
-    public int getShipSize() {
-         return shipSize;
+    public int getSize() {
+        return size;
     }
-
 }
-
-//BATTLESHIP(4)
-//CRUISER(3)
-//DESTROYER(2)
-//SUBMARINE(1)
