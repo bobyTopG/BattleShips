@@ -4,9 +4,7 @@ import java.util.Scanner;
 
 public class GameController {
 
-    private LeaderBoard leaderBoard;
     private Board board;
-    private Player player;
     private PersistenceController persistenceController;
     boolean gameEnded = false;
 
@@ -15,10 +13,6 @@ public class GameController {
 
     //Constructor
     public GameController() {
-    }
-
-
-    public void selectPlayer(String player) {
     }
 
     public void startGame(int difficulty) {
@@ -37,14 +31,14 @@ public class GameController {
             System.out.print(menu.menuOptions());
             char command = scanner.nextLine().charAt(0);
 
-            if (command == 't' || command == 'r' || command == 'a') {
+            if (command == 'a' || command == 's' || command == 'r') {
                 System.out.print(" X: ");
                 int x = Integer.parseInt(scanner.nextLine()) - 1;
                 System.out.print(" Y: ");
                 int y = Integer.parseInt(scanner.nextLine()) - 1;
 
-                if (command == 't') {
-                    menu.shipToWater(board, x, y);
+                if (command == 's') {
+                    menu.tileToWater(board, x, y);
                 } else if (command == 'r') {
                     menu.removeTile(board, x, y);
                 } else {
@@ -53,7 +47,7 @@ public class GameController {
 
                 System.out.println(board);
                 System.out.println(getElapsedTime());
-            } else if (command == 's') {
+            } else if (command == 't') {
                 System.out.print(menu.stopAndRevtileTiles(board));
                 gameEnded = true;
             }
@@ -63,15 +57,6 @@ public class GameController {
 
         System.out.println(gameEnded ? "You lost :(" : "You win :) \nFinal " + getElapsedTime());
     }
-
-    public String getElapsedTime() {
-        if (startTime == 0) {
-            return "Timer has not started.";
-        }
-        long elapsedTime = (endTime > 0 ? endTime : System.currentTimeMillis()) - startTime;
-        return String.format("Elapsed time: %.2f seconds", elapsedTime / 1000.0);
-    }
-
 
 
     public void endGame() {
@@ -93,6 +78,17 @@ public class GameController {
     }
 
     public void showCredits() {
+    }
+
+    public void selectPlayer(String player) {
+    }
+
+    public String getElapsedTime() {
+        if (startTime == 0) {
+            return "Timer has not started.";
+        }
+        long elapsedTime = (endTime > 0 ? endTime : System.currentTimeMillis()) - startTime;
+        return String.format("Elapsed time: %.2f seconds", elapsedTime / 1000.0);
     }
 
 }

@@ -9,12 +9,13 @@ public class SimpleMenu {
     }
 
     public String menuOptions() {
-        return "a - Add Ship/t - Ship To Water/ r - Remove Tile / s - Stop and revile tiles / press c continue:  ";
+        return "a - Add Ship/ s - Ship To Water/ r - Remove Tile / t -  revile tiles / press c continue:  ";
     }
 
-    public void shipToWater(Board board, int x, int y) {
-        board.makeTileAShip(x, y);
+    public void tileToWater(Board board, int x, int y) {
+        board.makeTileWater(x, y);
     }
+
     public void addShip(Board board, int x, int y) {
         board.makeTileAShip(x, y);
     }

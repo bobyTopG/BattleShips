@@ -4,22 +4,18 @@ import java.util.Random;
 
 public class Board {
 
-    private int boardSize;
-    private char[][] tiles;
-    private char[][] tilesSolution;
+    private final int boardSize; //Difficulty!
+    private  char[][] tiles;
+    private  char[][] tilesSolution;
     private SimpleMenu menu;
-
-    private long startTime;
-    private long endTime;
 
     public Board(int boardSize) {
         this.boardSize = boardSize;
         tiles = new char[boardSize][boardSize];
         tilesSolution = new char[boardSize][boardSize];
         SimpleMenu simpleMenu = new SimpleMenu();
-        startTime = System.currentTimeMillis();
-    }
 
+    }
 
     public boolean isGameOver() {
         if (tiles.length != tilesSolution.length || tiles[0].length != tilesSolution[0].length) {
@@ -41,6 +37,7 @@ public class Board {
 
         return true;
     }
+
 
     public void generateShips() {
 
@@ -95,7 +92,6 @@ public class Board {
         }
     }
 
-
     public void generateTiles() {
         System.out.println("Generating Tiles..."); // Debug print
 
@@ -137,7 +133,9 @@ public class Board {
             System.out.println("New ship added.");
             tilesSolution[x][y] = '□';
         } else if (tilesSolution[x][y] == '~') {
-            System.out.println("Hey! This is a hint :)");
+            tilesSolution[x][y] = '□';
+            System.out.println("New ship added.");
+            //System.out.println("Hey! This is a hint :)");
         }
     }
 
@@ -164,6 +162,7 @@ public class Board {
             System.out.println("No correction needed.");
         }
     }
+
 
     public String printAnswer() {
         StringBuilder sb = new StringBuilder();
@@ -212,7 +211,6 @@ public class Board {
 
         return sb.toString();
     }
-
 
     @Override
     public String toString() {
