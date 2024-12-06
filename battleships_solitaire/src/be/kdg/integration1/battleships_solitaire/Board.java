@@ -99,7 +99,7 @@ public class Board {
         // Randomly place hint tiles (X)
         Random rand = new Random();
         int placed = 0;
-        while (placed < boardSize*1.5) {
+        while (placed < boardSize * 1.5) {
             int x = rand.nextInt(boardSize);
             int y = rand.nextInt(boardSize);
 
@@ -118,7 +118,7 @@ public class Board {
 
                 if (tile == '\0') { // Default empty tile
                     tiles[i][j] = '~';
-                    tilesSolution[i][j] = '~';
+                    tilesSolution[i][j] = '#';
                 }
             }
         }
@@ -160,12 +160,24 @@ public class Board {
         } else if (tilesSolution[x][y] == '~') {
             System.out.println("Removing water tile...");
             tilesSolution[x][y] = '#';
-        }else if (tiles[x][y] == 'X') {
+        } else if (tiles[x][y] == 'X') {
             System.out.println("Hey! This is a hint :)");
-        }
-        else {
+        } else {
             System.out.println("No correction needed.");
         }
+    }
+
+    public void revealTile() {
+        Random rand = new Random();
+        int x, y;
+        do {
+            x = rand.nextInt(boardSize);
+            y = rand.nextInt(boardSize);
+        } while (tiles[x][y] != '~');
+
+        // Reveal the tile by copying it to tilesSolution
+        tilesSolution[x][y] = tiles[x][y];
+        System.out.printf("Revealed tile at X: %d, Y: %d\n", x, y);
     }
 
 
@@ -242,7 +254,8 @@ public class Board {
                 if (tiles[i][j] == '□') rowShipCount++;  // Increment ship count
 
                 // Append tile to the grid
-                sb.append(tile == '#' || tile == 'X' ? " " + tile + " " : " # ");
+                sb.append(tile == 'X' || tile == '~' || tile == '□' ? " " + tile + " " : " # ");
+
             }
             sb.append("| ").append(rowShipCount).append("\n");  // Append row ship count
         }

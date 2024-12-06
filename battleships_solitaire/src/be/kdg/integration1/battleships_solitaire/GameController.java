@@ -52,6 +52,11 @@ public class GameController {
                 System.out.print(menu.stopAndRevtileTiles(board));
                 gameEnded = true;
             }
+            else if (command == 'l') {
+                board.revealTile();
+                System.out.println(board);
+                System.out.println(getElapsedTime());
+            }
         }
 
         endTime = System.currentTimeMillis();
