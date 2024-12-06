@@ -17,8 +17,8 @@ public class Board {
         // Initialize tiles with default values
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                tiles[i][j] = new Tile(i, j, false);
-                tilesSolution[i][j] = new Tile(i, j, false);
+                tiles[i][j] = new Tile(i, j);
+                tilesSolution[i][j] = new Tile(i, j);
             }
         }
     }
@@ -39,7 +39,7 @@ public class Board {
         Random rand = new Random();
         System.out.println("Generating ships...");
 
-        while (ships.size() < 5) { // Example: Add 5 ships
+        while (ships.size() < boardSize/2) { // Add ships
             ShipType shipType = ShipType.values()[rand.nextInt(ShipType.values().length)];
             boolean isVertical = rand.nextBoolean();
             int x = rand.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));

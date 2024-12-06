@@ -10,10 +10,9 @@ public class Tile {
 
 
 
-    public Tile(int x, int y, boolean isShip ) {
+    public Tile(int x, int y ) {
         this.x = x;
         this.y = y;
-        this.isShip = isShip;
 
     }
 
