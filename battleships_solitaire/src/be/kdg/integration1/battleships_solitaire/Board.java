@@ -140,7 +140,7 @@ public class Board {
     }
 
     public void makeTileWater(int x, int y) {
-        if (!tilesSolution[x][y].isShip()) {
+        if (tilesSolution[x][y].isWater()) {
             System.out.println("This is already water");
         } else if (tiles[x][y].isHint()) {
             System.out.println("Hey! There is hint :)");
