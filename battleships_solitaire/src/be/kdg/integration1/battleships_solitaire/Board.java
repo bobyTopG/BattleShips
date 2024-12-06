@@ -11,6 +11,7 @@ public class Board {
 
     private int boardSize;
     private char[][] tiles;
+    //TODO: maybe rename tilesCopy to tilesSolution for clarity?
     private char[][] tilesCopy;
     private SimpleMenu menu;
 
@@ -171,10 +172,12 @@ public class Board {
         }
     }
 
-
     public void removeTile(int x, int y) {
-        if (tilesCopy[x][y] == '□' || tilesCopy[x][y] == '~') {
+        if (tilesCopy[x][y] == '□') {
             System.out.println("Removing ship part...");
+            tilesCopy[x][y] = '#';
+        } else if (tilesCopy[x][y] == '~') {
+            System.out.println("Removing water tile...");
             tilesCopy[x][y] = '#';
         } else {
             System.out.println("No correction needed.");
