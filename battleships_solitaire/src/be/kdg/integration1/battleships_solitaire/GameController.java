@@ -30,6 +30,7 @@ public class GameController {
 
         while (!board.isGameOver() && !gameEnded) {
             System.out.print(menu.menuOptions());
+
             char command = scanner.nextLine().charAt(0);
 
             if (command == 'a' || command == 's' || command == 'r') {
@@ -48,14 +49,18 @@ public class GameController {
 
                 System.out.println(board);
                 System.out.println(getElapsedTime());
-            } else if (command == 't') {
+            } else if (command == 'e') {
                 System.out.print(menu.stopAndRevtileTiles(board));
                 gameEnded = true;
-            }
-            else if (command == 'l') {
+            } else if (command == 'h') {
+                System.out.printf(menu.help());
+            } else if (command == 'l') {
                 board.revealTile();
                 System.out.println(board);
                 System.out.println(getElapsedTime());
+            }
+            else {
+                System.out.println("Invalid command");
             }
         }
 

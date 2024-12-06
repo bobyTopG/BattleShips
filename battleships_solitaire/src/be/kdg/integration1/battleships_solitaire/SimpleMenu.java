@@ -9,7 +9,12 @@ public class SimpleMenu {
     }
 
     public String menuOptions() {
-        return "a - Add Ship/ s - Ship To Water/ r - Remove Tile / t -  revile tiles / press c continue:  ";
+        return "h - help / a / s / r / e / l : ";
+    }
+
+    public String help(){
+        return "a - Add Ship / s - Ship To Water / r - Remove Tile\n" +
+                "e -  End the game / l - Revile a tile \n\n";
     }
 
     public void tileToWater(Board board, int x, int y) {
