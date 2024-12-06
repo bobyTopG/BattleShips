@@ -26,72 +26,42 @@ public class GameController {
         Board board = new Board(difficulty);
         SimpleMenu menu = new SimpleMenu();
 
-        // Placing ships on the board
-        for (int i = 0; i < 1; i++) {
-            board.generateShips();
-        }
-        ;
+        // Place ships and generate tiles
+        board.generateShips();
         board.generateTiles();
+
         startTime = System.currentTimeMillis();
-        System.out.println(board.toString());
+        System.out.println(board);
 
-        outer:
-        while (!board.isGameOver()) {
-            while (true) {
-                System.out.print(menu.menuOptions());
-                char line = ' ';
-                line = scanner.nextLine().charAt(0);
+        while (!board.isGameOver() && !gameEnded) {
+            System.out.print(menu.menuOptions());
+            char command = scanner.nextLine().charAt(0);
 
-                if (line == 't') {
-                    System.out.print(" X: ");
-                    int x = Integer.parseInt(scanner.nextLine())-1;
-                    System.out.print(" Y: ");
-                    int y = Integer.parseInt(scanner.nextLine())-1;
-                    menu.shipToWater(board , x , y);
-                    System.out.println(board.toString());
-                    System.out.println(getElapsedTime());
+            if (command == 't' || command == 'r' || command == 'a') {
+                System.out.print(" X: ");
+                int x = Integer.parseInt(scanner.nextLine()) - 1;
+                System.out.print(" Y: ");
+                int y = Integer.parseInt(scanner.nextLine()) - 1;
 
-                } else if (line == 'r') {
-                    System.out.print(" X: ");
-                    int x = Integer.parseInt(scanner.nextLine())-1;
-                    System.out.print(" Y: ");
-                    int y = Integer.parseInt(scanner.nextLine())-1;
-                    menu.removeTile(board , x , y);
-                    System.out.println(board.toString());
-                    System.out.println(getElapsedTime());
-
-                }
-                else if(line == 'a') {
-                    System.out.print(" X: ");
-                    int x = Integer.parseInt(scanner.nextLine())-1;
-                    System.out.print(" Y: ");
-                    int y = Integer.parseInt(scanner.nextLine())-1;
+                if (command == 't') {
+                    menu.shipToWater(board, x, y);
+                } else if (command == 'r') {
+                    menu.removeTile(board, x, y);
+                } else {
                     menu.addShip(board, x, y);
-                    System.out.println(board);
-                    System.out.println(getElapsedTime());
                 }
-                else if (line == 's') {
-                    System.out.print(menu.stopAndRevtileTiles(board));
-                    gameEnded = true;
-                    break;
-                }
-                else{
-                    break;
-                }
-                if(board.isGameOver()) {break outer;}
+
+                System.out.println(board);
+                System.out.println(getElapsedTime());
+            } else if (command == 's') {
+                System.out.print(menu.stopAndRevtileTiles(board));
+                gameEnded = true;
             }
-            if (gameEnded) break;
-
-
-
         }
+
         endTime = System.currentTimeMillis();
-        if(gameEnded) {
-            System.out.println("You lost :(");
-        }else {
-            System.out.print("You win :) \nFinal ");
-        }
-        System.out.println(getElapsedTime());
+
+        System.out.println(gameEnded ? "You lost :(" : "You win :) \nFinal " + getElapsedTime());
     }
 
     public String getElapsedTime() {
@@ -101,6 +71,8 @@ public class GameController {
         long elapsedTime = (endTime > 0 ? endTime : System.currentTimeMillis()) - startTime;
         return String.format("Elapsed time: %.2f seconds", elapsedTime / 1000.0);
     }
+
+
 
     public void endGame() {
     }

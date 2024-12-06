@@ -5,6 +5,9 @@ import java.util.Date;
 public class Main {
     public static void main(String[] args) {
        GameController gameController = new GameController();
-       gameController.startGame(5);
+       int difficulty = 5;
+       if(difficulty >= 5) {
+           gameController.startGame(difficulty);
+       }
     }
 }
