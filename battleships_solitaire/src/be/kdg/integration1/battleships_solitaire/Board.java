@@ -10,18 +10,19 @@ import java.util.Random;
 public class Board {
 
     private int boardSize;
-    private int score;
     private char[][] tiles;
     private char[][] tilesCopy;
     private SimpleMenu menu;
 
+    private long startTime;
+    private long endTime;
 
     public Board(int boardSize) {
         this.boardSize = boardSize;
-
         tiles = new char[boardSize][boardSize];
         tilesCopy = new char[boardSize][boardSize];
         SimpleMenu simpleMenu = new SimpleMenu();
+        startTime = System.currentTimeMillis();
     }
 
 
@@ -50,7 +51,7 @@ public class Board {
         Random rand = new Random();
 
         System.out.println("Generating ships...");
-        int size = rand.nextInt(2, 5); // Ship size between 2 and 4 tiles
+        int size = rand.nextInt(1, 5); // Ship size between 1 and 4 tiles
         boolean isCreated = false;
 
         while (!isCreated) {
@@ -66,7 +67,7 @@ public class Board {
                 int cy = isVertical ? startY : startY + i;
 
                 if (tiles[cx][cy] == '□') {
-                    System.out.printf("Overlap detected at (%d, %d)\n", cx, cy);
+                    System.out.printf("Overlap detected at (%d, %d)\n", cx, cy); // Debug print
                     canPlace = false;
                     break;
                 }
@@ -74,11 +75,12 @@ public class Board {
                 // Check surrounding tiles
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dy = -1; dy <= 1; dy++) {
+
                         int adjX = cx + dx;
                         int adjY = cy + dy;
                         if (adjX >= 0 && adjX < boardSize && adjY >= 0 && adjY < boardSize) {
                             if (tiles[adjX][adjY] == '□') {
-                                System.out.printf("Touching ship detected at (%d, %d)\n", adjX, adjY);
+                                System.out.printf("Touching ship detected at (%d, %d)\n", adjX, adjY); // Debug print
                                 canPlace = false;
                                 break;
                             }
@@ -97,36 +99,35 @@ public class Board {
                     tiles[cx][cy] = '□';
                 }
                 isCreated = true;
-                System.out.println("Ship successfully placed!");
+                System.out.println("Ship successfully placed!");// Debug print
             } else {
-                System.out.println("Failed to place ship, retrying...");
+                System.out.println("Failed to place ship, retrying...");// Debug print
             }
         }
     }
 
 
     public void generateTiles() {
-        System.out.println("Generating Tiles...");
+        System.out.println("Generating Tiles...");// Debug print
 
-//        // Randomly place 6 hint tiles (~)
-//        Random rand = new Random();
-//        int placed = 0;
-//        while (placed < 6) {
-//            int x = rand.nextInt(boardSize);
-//            int y = rand.nextInt(boardSize);
-//
-//            // Only place a hint if it's not already a hint or ship
-//            if (tiles[x][y] != '□' && tiles[x][y] != '~') {
-//                tiles[x][y] = '~';
-//                tilesCopy[x][y] = '~';
-//                placed++;
-//            }
-//        }
+        // Randomly place 6 hint tiles (~)
+        Random rand = new Random();
+        int placed = 0;
+        while (placed < 6) {
+            int x = rand.nextInt(boardSize);
+            int y = rand.nextInt(boardSize);
+
+            // Only place a hint if it's not already a hint or ship
+            if (tiles[x][y] != '□' && tiles[x][y] != '~') {
+                tiles[x][y] = '~';
+                tilesCopy[x][y] = '~';
+                placed++;
+            }
+        }
 
 
         for (int i = 0; i < boardSize; i++) {
             // Add row number
-
             for (int j = 0; j < boardSize; j++) {
                 char tile = tiles[i][j];
 
@@ -146,35 +147,37 @@ public class Board {
     }
 
 
-    public void revealTile(int x, int y) {
+    public void makeTileAShip(int x, int y) {
         if (tilesCopy[x][y] == '□') {
-            System.out.println("There is a ship");
+            System.out.println("There is already a ship");
         } else if (tilesCopy[x][y] == '#') {
             System.out.println("New ship added.");
             tilesCopy[x][y] = '□';
         } else if (tilesCopy[x][y] == '~') {
-            System.out.println("Hey this is a hint :).");
+            System.out.println("Hey! This is a hint :)");
+        }
+    }
+
+    public void makeTileWater(int x, int y) {
+        if (tilesCopy[x][y] == '~') {
+            System.out.println("This is already a water");
+        } else if (tilesCopy[x][y] == '#') {
+            System.out.println("New water tile added.");
+            tilesCopy[x][y] = '~';
+        } else if (tilesCopy[x][y] == '□') {
+            System.out.println("New water tile added.");
+            tilesCopy[x][y] = '~';
         }
     }
 
 
-    public void correctTile(int x, int y) {
-        if (tilesCopy[x][y] == '□') {
+    public void removeTile(int x, int y) {
+        if (tilesCopy[x][y] == '□' || tilesCopy[x][y] == '~') {
             System.out.println("Removing ship part...");
             tilesCopy[x][y] = '#';
         } else {
             System.out.println("No correction needed.");
         }
-    }
-
-
-    public void updateTile(Tile tile) {
-
-
-    }
-
-    public int getBoardSize() {
-        return boardSize;
     }
 
 

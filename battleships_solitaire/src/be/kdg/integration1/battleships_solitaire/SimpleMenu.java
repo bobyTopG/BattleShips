@@ -4,25 +4,27 @@ import java.util.Timer;
 
 public class SimpleMenu {
 
-    private Player player;
-    private Board board;
-    private Timer duration;
-
     public SimpleMenu() {
 
     }
 
-    public String help() {
-        return "This is the help ifo";
+    public String menuOptions() {
+        return "a - Add Ship/t - Ship To Water/ r - Remove Tile / s - Stop and revile tiles / press c continue:  ";
     }
 
-    public void exit(){
-        System.out.println("Goodbye!");
+    public void shipToWater(Board board, int x, int y) {
+        board.makeTileAShip(x, y);
+    }
+    public void addShip(Board board, int x, int y) {
+        board.makeTileAShip(x, y);
     }
 
-    public void save() {
-        System.out.println("Saving...");
+    public void removeTile(Board board, int x, int y) {
+        board.removeTile(x, y);
     }
 
+    public String stopAndRevtileTiles(Board board) {
+        return board.printAnswer();
+    }
 
 }
