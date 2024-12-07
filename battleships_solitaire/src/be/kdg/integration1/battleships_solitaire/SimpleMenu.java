@@ -9,7 +9,7 @@ public class SimpleMenu {
     }
 
     public String menuOptions() {
-        return "h - help / a / s / r / e / l : ";
+        return "    h - help / a / s / r / e / l : ";
     }
 
     public String help(){

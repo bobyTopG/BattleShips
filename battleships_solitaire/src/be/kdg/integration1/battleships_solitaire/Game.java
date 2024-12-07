@@ -13,7 +13,7 @@ public class Game {
 
     public void start(Leaderboard leaderboard) {
         Scanner scanner = new Scanner(System.in);
-        System.out.printf("Welcome to Battleships Solitaire Game! \n Player name: ");
+        System.out.printf("\n\nWelcome to Battleships Solitaire Game! \nPlayer name: ");
         String name = scanner.nextLine();
 
         player = new Player(name);

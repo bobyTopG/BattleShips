@@ -66,7 +66,13 @@ public class GameController {
                 System.out.println(leaderboard.toString());
             }
 
-            System.out.println(gameEnded ? "You lost :(" : "You win :) \n" + getElapsedTime());
+        if (gameEnded) {
+            System.out.println("\n--------- Game Over ---------");
+            System.out.println("Hey! Next time don't quit =(\n");
+        } else {
+            System.out.println("--------- You win =) ---------");
+            System.out.println(getElapsedTime() + "\n");
+        }
             System.out.println(leaderboard.toString());
 
             System.out.println("Another game? y/n");
