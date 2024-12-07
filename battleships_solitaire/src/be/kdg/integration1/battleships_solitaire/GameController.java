@@ -44,9 +44,7 @@ public class GameController {
                     } else {
                         menu.addShip(board, x, y);
                     }
-
                     System.out.println(board);
-                    System.out.println(getElapsedTime());
                 } else if (command == 'e') {
                     System.out.print(menu.stopAndRevtileTiles(board));
                     gameEnded = true;
@@ -54,9 +52,11 @@ public class GameController {
                     System.out.printf(menu.help());
                 } else if (command == 'l') {
                     board.revealTile();
+                    System.out.println(board);
                 } else {
                     System.out.println("Invalid command");
                 }
+
             }
 
             endTime = System.currentTimeMillis();

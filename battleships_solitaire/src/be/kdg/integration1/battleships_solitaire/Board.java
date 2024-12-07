@@ -39,7 +39,7 @@ public class Board {
         Random rand = new Random();
        // System.out.println("Generating ships...");
 
-        while (ships.size() < boardSize/2) { // Add ships
+        while (ships.size() < boardSize) { // Add ships
             ShipType shipType = ShipType.values()[rand.nextInt(ShipType.values().length)]; //Ensuring that a random ship type is chosen
             boolean isVertical = rand.nextBoolean();
             int x = rand.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
