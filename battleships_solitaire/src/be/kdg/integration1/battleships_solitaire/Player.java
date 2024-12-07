@@ -3,38 +3,31 @@ package be.kdg.integration1.battleships_solitaire;
 public class Player {
 
     private String name;
-    private int id;
+    private int score;
 
-
-    public Player(String name, int id) {
+    public Player(String name) {
         this.name = name;
-        this.id = id;
+        this.score = 0; // Score starts at 0
     }
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
 
     public String getName() {
         return name;
     }
 
-    public Tile play(){
-        return null;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
+    public int getScore() {
+        return score;
     }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void increaseScore(int points) {
+        this.score += points;  // Adds points to the score
+    }
+
 }
-
-
-//+play(): Tile
-//+toString(): String

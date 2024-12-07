@@ -24,7 +24,7 @@ public class Board {
     }
 
     public boolean isGameOver() {
-        // Check if the game is over
+        // Only when all the ships are placed
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 if (tiles[i][j].isShip() && !tilesSolution[i][j].isShip()) {
@@ -37,10 +37,10 @@ public class Board {
 
     public void generateShips() {
         Random rand = new Random();
-        System.out.println("Generating ships...");
+       // System.out.println("Generating ships...");
 
         while (ships.size() < boardSize/2) { // Add ships
-            ShipType shipType = ShipType.values()[rand.nextInt(ShipType.values().length)];
+            ShipType shipType = ShipType.values()[rand.nextInt(ShipType.values().length)]; //Ensuring that a random ship type is chosen
             boolean isVertical = rand.nextBoolean();
             int x = rand.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
             int y = rand.nextInt(boardSize - (isVertical ? 0 : shipType.getSize()));
@@ -50,9 +50,9 @@ public class Board {
             if (canPlaceShip(newShip)) {
                 placeShip(newShip);
                 ships.add(newShip);
-                System.out.println("Placed: " + shipType + " at (" + x + ", " + y + ")");
+               // System.out.println("Placed: " + shipType + " at (" + x + ", " + y + ")");
             } else {
-                System.out.println("Failed to place: " + shipType + ", retrying...");
+               // System.out.println("Failed to place: " + shipType + ", retrying...");
             }
         }
     }
@@ -100,8 +100,8 @@ public class Board {
         return true;
     }
 
-    public void generateTiles() {
-        System.out.println("Generating Tiles...");
+    public void generateTiles(){
+       // System.out.println("Generating Tiles...");
 
         Random rand = new Random();
         int placed = 0;
@@ -178,7 +178,9 @@ public class Board {
         System.out.printf("Revealed tile at X: %d, Y: %d\n", x+1, y+1);
     }
 
-
+    public int getBoardSize() {
+        return boardSize;
+    }
 
     public String printAnswer() {
         StringBuilder sb = new StringBuilder();
