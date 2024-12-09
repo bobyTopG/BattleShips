@@ -6,7 +6,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Leaderboard leaderboard = new Leaderboard();
-       Game game = new Game();
-       game.start(leaderboard);
+        new PersistenceController();
+        Game game = new Game();
+        game.start(leaderboard);
     }
 }

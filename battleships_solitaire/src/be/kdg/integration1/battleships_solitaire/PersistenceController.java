@@ -10,7 +10,7 @@ public class PersistenceController {
         try {
             // make connection to the postgres database
             // if successful, run createTables method
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/battleships", "postgres", "Student_1234");
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ascii2", "postgres", "Student_1234");
             System.out.println("Connection available!");
             createTables();
         } catch (SQLException e) {
