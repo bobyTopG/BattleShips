@@ -1,5 +1,5 @@
 /* Dropping the database and the tables if they already exist */
--- DROP DATABASE IF EXISTS battleships;
+-- DROP DATABASE IF EXISTS ascii2;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE IF EXISTS games CASCADE;
 DROP TABLE IF EXISTS tiles CASCADE;
@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS ships CASCADE;
 DROP TABLE IF EXISTS placements CASCADE;
 
 /* Creating the database */
--- CREATE DATABASE battleships;
+-- CREATE DATABASE ascii2;
 
 /* Creating the PLAYERS table */
 CREATE TABLE IF NOT EXISTS players (
