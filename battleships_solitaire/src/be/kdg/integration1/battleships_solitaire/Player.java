@@ -5,18 +5,25 @@ import java.time.LocalDate;
 
 public class Player {
 
+    private final int id;
     private String name;
     private Date birthdate;
     private Date joindate;
 
-    public Player(String name) {
+    public Player(int id, String name) {
+        this.id = id;
         setName(name);
     }
 
-    public Player(String name, Date birthdate) {
-        this(name);
+    public Player(int id, String name, Date birthdate) {
+        this(id, name);
         setBirthdate(birthdate);
         setJoindate(Date.valueOf(LocalDate.now()));
+    }
+
+    public Player(int id, String name, Date birthdate, Date joindate) {
+        this(id, name, birthdate);
+        setJoindate(joindate);
     }
 
     public Date getBirthdate() {
@@ -39,6 +46,10 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setName(String name) {

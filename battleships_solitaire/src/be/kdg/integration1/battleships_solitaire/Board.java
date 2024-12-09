@@ -4,13 +4,15 @@ import java.util.*;
 
 public class Board {
 
+    private final int id;
     private final int boardSize;
     private final int shipAmount;
     private Tile[][] playerTiles;
     private Tile[][] answerTiles;
     private List<Ship> ships;
 
-    public Board(int boardSize) {
+    public Board(int id, int boardSize) {
+        this.id = id;
         if (!(boardSize == 5 || boardSize == 7 || boardSize == 9))
             throw new IllegalArgumentException();
         this.boardSize = boardSize;
@@ -201,6 +203,14 @@ public class Board {
 
     public int getBoardSize() {
         return boardSize;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Tile[][] getPlayerTiles() {
+        return playerTiles;
     }
 
     public String printAnswer() {

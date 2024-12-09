@@ -1,6 +1,8 @@
 package be.kdg.integration1.battleships_solitaire;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class PersistenceController {
 
@@ -15,7 +17,7 @@ public class PersistenceController {
         try {
             connection = DriverManager.getConnection(URL + TABLE, USERNAME, PASSWORD);
             createTables();
-            System.out.println("There are " + getGameCount() + " game(s) in the database;");
+            System.out.println("There are " + getGameCount() + " game(s) in the database");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -124,14 +126,104 @@ public class PersistenceController {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, player.getName());
             statement.setDate(2, player.getBirthdate());
-            statement.execute(query);
+            statement.executeUpdate();
+            statement.close();
         } catch (SQLException e) {
-            System.err.println(e.getMessage() + "\n-> Could not save player in the database!");
+            e.printStackTrace();
+            System.err.println("Could not save player in the database!");
         }
     }
 
-    public Player loadPlayer(String name) {
+    public Player fetchPlayer(String name) {
+        try {
+            name = name.toUpperCase();
+            String query = "SELECT * FROM players WHERE name = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Player(
+                        resultSet.getInt("player_id"),
+                        resultSet.getString("name"),
+                        resultSet.getDate("birthdate"),
+                        resultSet.getDate("join_date")
+                );
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Could not load player from the database!");
+        }
         return null;
+    }
+
+    public Player fetchPlayer(int id) {
+        try {
+            String query = "SELECT * FROM players WHERE player_id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Player(
+                        resultSet.getInt("player_id"),
+                        resultSet.getString("name"),
+                        resultSet.getDate("birthdate"),
+                        resultSet.getDate("join_date")
+                );
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Could not load player from the database!");
+        }
+        return null;
+    }
+
+    public void saveGame(Player player, Board board) {
+        try {
+            /* Saving the game session */
+            String gameQuery = "INSERT INTO games (player_id, board_size, score, start, duration) VALUES (?, ?, ?, ?, ?);";
+            PreparedStatement statement = connection.prepareStatement(gameQuery);
+            statement.setInt(1, player.getId());
+            statement.setInt(2, board.getBoardSize());
+            statement.setInt(3, 0); // TODO: score from the board?
+            statement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now())); // TODO: start from the board?
+            statement.setString(5, "5 min"); // TODO: duration from the board?
+            statement.executeUpdate();
+            statement.close();
+            /* Get the game back as it is in the database */
+            // TODO: get the game from the db
+            /* Saving the tiles of the board */
+            String tilesQuery = "INSERT INTO tiles (game_id, x, y, is_ship) VALUES (?, ?, ?, ?);";
+            statement = connection.prepareStatement(tilesQuery);
+            for (Tile[] row : board.getPlayerTiles()) {
+                for (Tile tile : row) {
+                    statement.setInt(1, board.getId());
+                    statement.setString(2, String.valueOf('A' + tile.getX() - 1));
+                    statement.setInt(3, tile.getY());
+                    if (tile.isShip() || tile.isWater()) {
+                        statement.setBoolean(4, tile.isShip());
+                    } else {
+                        statement.setObject(4, null);
+                    }
+                    statement.executeUpdate();
+                }
+            }
+            /* Saves ships to the board, too */
+            // TODO: implement this last part, argh
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Could not save player in the database!");
+        }
+        // TODO:? we can try to separate the queries into different methods
+    }
+
+    public Board fetchGame(String name) {
+        Board board = null;
+        /* TODO */
+        return board;
     }
 
     public int getGameCount() {
