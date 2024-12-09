@@ -13,6 +13,7 @@ public class PersistenceController {
             connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ascii2", "postgres", "Student_1234");
             System.out.println("Connection available!");
             createTables();
+            System.out.println("There are " + getGameCount() + " game(s) in the database;");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -108,4 +109,18 @@ public class PersistenceController {
             e.printStackTrace();
         }
     }
+
+    public int getGameCount() {
+        int gameCount = 0;
+        String query = "SELECT COUNT(*) FROM games";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next())
+                gameCount = rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return gameCount;
+    }
+
 }
