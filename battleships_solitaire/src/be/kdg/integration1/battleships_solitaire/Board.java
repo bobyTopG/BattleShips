@@ -3,47 +3,31 @@ package be.kdg.integration1.battleships_solitaire;
 import java.util.*;
 
 public class Board {
+
     private final int boardSize;
-    private Tile[][] tiles;
-    private Tile[][] tilesSolution;
+    private final int shipAmount;
+    private Tile[][] playerTiles;
+    private Tile[][] answerTiles;
     private List<Ship> ships;
 
     public Board(int boardSize) {
+        if (!(boardSize == 5 || boardSize == 7 || boardSize == 9))
+            throw new IllegalArgumentException();
         this.boardSize = boardSize;
-        this.tiles = new Tile[boardSize][boardSize];
-        this.tilesSolution = new Tile[boardSize][boardSize];
-        this.ships = new ArrayList<>();
-
-        // Initialize tiles with default values
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                tiles[i][j] = new Tile(i, j);
-                tilesSolution[i][j] = new Tile(i, j);
-            }
-        }
-    }
-
-    public boolean isGameOver() {
-        // Only when all the ships are placed
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                if (tiles[i][j].isShip() && !tilesSolution[i][j].isShip()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        this.shipAmount = boardSize - 1;
+        generateShips();
+        generateTiles();
     }
 
     public void generateShips() {
-        Random rand = new Random();
-        // System.out.println("Generating ships...");
+        Random random = new Random();
+        this.ships = new ArrayList<>(shipAmount);
 
-        while (ships.size() < boardSize / 2) { // Add ships
-            ShipType shipType = ShipType.values()[rand.nextInt(ShipType.values().length)]; //Ensuring that a random ship type is chosen
-            boolean isVertical = rand.nextBoolean();
-            int x = rand.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
-            int y = rand.nextInt(boardSize - (isVertical ? 0 : shipType.getSize()));
+        while (ships.size() < shipAmount) { // Add ships
+            ShipType shipType = ShipType.values()[random.nextInt(ShipType.values().length)]; // Ensuring that a random ship type is chosen
+            boolean isVertical = random.nextBoolean();
+            int x = random.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
+            int y = random.nextInt(boardSize - (isVertical ? 0 : shipType.getSize()));
 
             Ship newShip = new Ship(x, y, shipType, isVertical);
 
@@ -57,19 +41,6 @@ public class Board {
         }
     }
 
-    private void placeShip(Ship ship) {
-        int size = ship.getSize();
-        int x = ship.getX();
-        int y = ship.getY();
-        boolean isVertical = ship.isVertical();
-
-        for (int i = 0; i < size; i++) {
-            int cx = isVertical ? x + i : x;
-            int cy = isVertical ? y : y + i;
-            tiles[cx][cy].setShip(true);
-        }
-    }
-
     private boolean canPlaceShip(Ship ship) {
         int size = ship.getSize();
         int x = ship.getX();
@@ -80,7 +51,7 @@ public class Board {
             int cx = isVertical ? x + i : x;
             int cy = isVertical ? y : y + i;
 
-            if (cx >= boardSize || cy >= boardSize || tiles[cx][cy].isShip()) {
+            if (cx >= boardSize || cy >= boardSize || playerTiles[cx][cy].isShip()) {
                 return false; // Out of bounds or overlapping
             }
 
@@ -90,7 +61,7 @@ public class Board {
                     int adjX = cx + dx;
                     int adjY = cy + dy;
                     if (adjX >= 0 && adjX < boardSize && adjY >= 0 && adjY < boardSize &&
-                            tiles[adjX][adjY].isShip()) {
+                            playerTiles[adjX][adjY].isShip()) {
                         return false; // Adjacent to another ship
                     }
                 }
@@ -100,18 +71,38 @@ public class Board {
         return true;
     }
 
-    public void generateTiles() {
-        // System.out.println("Generating Tiles...");
+    private void placeShip(Ship ship) {
+        int size = ship.getSize();
+        int x = ship.getX();
+        int y = ship.getY();
+        boolean isVertical = ship.isVertical();
+        for (int i = 0; i < size; i++) {
+            int cx = isVertical ? x + i : x;
+            int cy = isVertical ? y : y + i;
+            playerTiles[cx][cy].setShip(true);
+        }
+    }
 
-        Random rand = new Random();
+    public void generateTiles() {
+
+        // System.out.println("Generating Tiles...");
+        this.playerTiles = new Tile[boardSize][boardSize];
+        this.answerTiles = new Tile[boardSize][boardSize];
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                playerTiles[i][j] = new Tile(i, j);
+                answerTiles[i][j] = new Tile(i, j);
+            }
+        }
+
+        Random random = new Random();
         int placed = 0;
         while (placed < boardSize * 2) {
-            int x = rand.nextInt(boardSize);
-            int y = rand.nextInt(boardSize);
-
-            if (!tiles[x][y].isShip()) { // Only place a hint if it's not already a hint or ship
-                tiles[x][y].setHint(true);
-                tilesSolution[x][y].setHint(true);
+            int x = random.nextInt(boardSize);
+            int y = random.nextInt(boardSize);
+            if (!playerTiles[x][y].isShip()) { // Only place a hint if it's not already a hint or ship
+                playerTiles[x][y].setHint(true);
+                answerTiles[x][y].setHint(true);
                 placed++;
             }
         }
@@ -119,46 +110,58 @@ public class Board {
         // Set other default tiles to '~'
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                if (!tiles[i][j].isShip()) {
-                    tiles[i][j].setShip(false);
-                    tiles[i][j].setWater(true);
-                    tilesSolution[i][j].setRevealed(false);
-
+                if (!playerTiles[i][j].isShip()) {
+                    playerTiles[i][j].setShip(false);
+                    playerTiles[i][j].setWater(true);
+                    answerTiles[i][j].setRevealed(false);
                 }
             }
         }
+
     }
 
-    public void makeTileAShip(int x, int y) {
-        if (tilesSolution[x][y].isShip()) {
+    public boolean isGameOver() {
+        // Only when all the ships are placed
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (playerTiles[i][j].isShip() && !answerTiles[i][j].isShip()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void markTileAsShip(int x, int y) {
+        if (answerTiles[x][y].isShip()) {
             System.out.println("There is already a ship");
-        } else if (tiles[x][y].isHint() || tilesSolution[x][y].isRevealed()) {
+        } else if (playerTiles[x][y].isHint() || answerTiles[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("New ship added.");
-            tilesSolution[x][y].setShip(true);
+            answerTiles[x][y].setShip(true);
         }
     }
 
-    public void makeTileWater(int x, int y) {
-        if (tilesSolution[x][y].isWater()) {
+    public void markTileAsWater(int x, int y) {
+        if (answerTiles[x][y].isWater()) {
             System.out.println("This is already water");
-        } else if (tiles[x][y].isHint() || tilesSolution[x][y].isRevealed()) {
+        } else if (playerTiles[x][y].isHint() || answerTiles[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("New water tile added.");
-            tilesSolution[x][y].setShip(false);
-            tilesSolution[x][y].setWater(true);
+            answerTiles[x][y].setShip(false);
+            answerTiles[x][y].setWater(true);
         }
     }
 
-    public void removeTile(int x, int y) {
-        if (tilesSolution[x][y].isShip() || tilesSolution[x][y].isWater() && !tilesSolution[x][y].isRevealed()) {
+    public void unmarkTile(int x, int y) {
+        if (answerTiles[x][y].isShip() || answerTiles[x][y].isWater() && !answerTiles[x][y].isRevealed()) {
             System.out.println("Removing ship part...");
-            tilesSolution[x][y].setShip(false);
-            tilesSolution[x][y].setWater(false);
+            answerTiles[x][y].setShip(false);
+            answerTiles[x][y].setWater(false);
 
-        } else if (tiles[x][y].isHint() || tilesSolution[x][y].isRevealed()) {
+        } else if (playerTiles[x][y].isHint() || answerTiles[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("No correction needed.");
@@ -170,7 +173,7 @@ public class Board {
         Random rand = new Random();
         int x, y;
         boolean revealedExist = false;
-        for (Tile[] row : tiles) {
+        for (Tile[] row : playerTiles) {
             for (Tile tile : row) {
                 if (!tile.isRevealed()) {
                     revealedExist = true;
@@ -187,14 +190,15 @@ public class Board {
             do {
                 x = rand.nextInt(boardSize);
                 y = rand.nextInt(boardSize);
-            } while (!tiles[x][y].isWater());
+            } while (!playerTiles[x][y].isWater());
 
-            tilesSolution[x][y] = tiles[x][y];
-            tilesSolution[x][y].setRevealed(true);
+            answerTiles[x][y] = playerTiles[x][y];
+            answerTiles[x][y].setRevealed(true);
 
             System.out.printf("Revealed tile at X: %d, Y: %d\n", x + 1, y + 1);
         }
     }
+
     public int getBoardSize() {
         return boardSize;
     }
@@ -218,7 +222,7 @@ public class Board {
             sb.append(String.format("%2d |", i + 1)); // Add row number
 
             for (int j = 0; j < boardSize; j++) {
-                Tile tile = tiles[i][j];
+                Tile tile = playerTiles[i][j];
 
                 // Count ships in the row
                 if (tile.isShip()) rowShipCount++;
@@ -238,7 +242,7 @@ public class Board {
         for (int j = 0; j < boardSize; j++) {
             int colShipCount = 0;
             for (int i = 0; i < boardSize; i++) {
-                if (tiles[i][j].isShip()) colShipCount++;
+                if (playerTiles[i][j].isShip()) colShipCount++;
             }
             sb.append(String.format("%2d ", colShipCount));
         }
@@ -267,9 +271,9 @@ public class Board {
             sb.append(String.format("%2d |", i + 1));  // Row number
 
             for (int j = 0; j < boardSize; j++) {
-                Tile tile = tilesSolution[i][j];
+                Tile tile = answerTiles[i][j];
 
-                if (tiles[i][j].isShip()) rowShipCount++;  // Increment ship count
+                if (playerTiles[i][j].isShip()) rowShipCount++;  // Increment ship count
 
                 // Append tile to the grid
                 sb.append(tile.isShip() ? " □ " : (tile.isHint() ? " X " : (tile.isWater() ? " ~ " : " # ")));
@@ -285,7 +289,7 @@ public class Board {
         for (int j = 0; j < boardSize; j++) {
             int colShipCount = 0;
             for (int i = 0; i < boardSize; i++) {
-                if (tiles[i][j].isShip()) colShipCount++;
+                if (playerTiles[i][j].isShip()) colShipCount++;
             }
             sb.append(String.format("%2d ", colShipCount));
         }
@@ -293,5 +297,5 @@ public class Board {
 
         return sb.toString();
     }
-}
 
+}

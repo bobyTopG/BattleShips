@@ -1,7 +1,5 @@
 package be.kdg.integration1.battleships_solitaire;
 
-import java.util.Timer;
-
 public class SimpleMenu {
 
     public SimpleMenu() {
@@ -18,15 +16,15 @@ public class SimpleMenu {
     }
 
     public void tileToWater(Board board, int x, int y) {
-        board.makeTileWater(x, y);
+        board.markTileAsWater(x, y);
     }
 
     public void addShip(Board board, int x, int y) {
-        board.makeTileAShip(x, y);
+        board.markTileAsShip(x, y);
     }
 
     public void removeTile(Board board, int x, int y) {
-        board.removeTile(x, y);
+        board.unmarkTile(x, y);
     }
 
     public String stopAndRevtileTiles(Board board) {
