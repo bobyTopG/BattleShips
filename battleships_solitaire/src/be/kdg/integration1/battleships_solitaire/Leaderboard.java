@@ -22,7 +22,7 @@ public class Leaderboard {
         Collections.sort(players, new Comparator<Player>() {
             @Override
             public int compare(Player p1, Player p2) {
-                return Integer.compare(p2.getScore(), p1.getScore());  // Higher score first
+                return 0; //Integer.compare(p2.getScore(), p1.getScore());  // Higher score first
             }
         });
     }
@@ -33,7 +33,7 @@ public class Leaderboard {
         System.out.println("Leaderboard:");
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
-            System.out.println((i + 1) + ". " + player.getName() + " - Score: " + player.getScore());
+//            System.out.println((i + 1) + ". " + player.getName() + " - Score: " + player.getScore());
         }
     }
 

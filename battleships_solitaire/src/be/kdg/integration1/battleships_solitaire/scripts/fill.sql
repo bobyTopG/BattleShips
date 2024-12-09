@@ -1,8 +1,8 @@
 /* Adding example data to the players table */
-INSERT INTO players (name)
-VALUES ('VIVIAN'),
-       ('BOYAN'),
-       ('ALUN');
+INSERT INTO players (name, birthdate)
+VALUES ('VIVIAN', '2024-10-08'),
+       ('BOYAN', '2023-09-23'),
+       ('ALUN', '2024-11-01');
 
 /* Adding data for 2 example games */
 INSERT INTO games (player_id, board_size, score, start, duration)

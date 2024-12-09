@@ -19,7 +19,13 @@ CREATE TABLE IF NOT EXISTS players (
         CONSTRAINT nn_player_name NOT NULL
         CONSTRAINT uq_player_name UNIQUE
         CONSTRAINT ch_player_name
-            CHECK ( name = UPPER(name) )
+            CHECK ( name = UPPER(name) ),
+    birthdate DATE
+        CONSTRAINT nn_birthdate NOT NULL
+        CONSTRAINT ch_birthdate
+            CHECK ( birthdate < NOW() ),
+    join_date DATE DEFAULT CURRENT_DATE
+        CONSTRAINT nn_join_date NOT NULL
 );
 
 /* Creating the GAMES table */

@@ -3,15 +3,17 @@ package be.kdg.integration1.battleships_solitaire;
 import java.sql.*;
 
 public class PersistenceController {
-    private Connection connection;
 
+    public final String URL = "jdbc:postgresql://localhost:5432/";
+    public final String TABLE = "ascii2";
+    public final String USERNAME = "postgres";
+    public final String PASSWORD = "Student_1234";
+
+    private Connection connection;
 
     public PersistenceController() {
         try {
-            // make connection to the postgres database
-            // if successful, run createTables method
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ascii2", "postgres", "Student_1234");
-            System.out.println("Connection available!");
+            connection = DriverManager.getConnection(URL + TABLE, USERNAME, PASSWORD);
             createTables();
             System.out.println("There are " + getGameCount() + " game(s) in the database;");
         } catch (SQLException e) {
@@ -32,7 +34,13 @@ public class PersistenceController {
                                         CONSTRAINT nn_player_name NOT NULL
                                         CONSTRAINT uq_player_name UNIQUE
                                         CONSTRAINT ch_player_name
-                                        CHECK ( name = UPPER(name) ))
+                                        CHECK ( name = UPPER(name) ),
+                                        birthdate DATE
+                                        CONSTRAINT nn_birthdate NOT NULL
+                                        CONSTRAINT ch_birthdate
+                                        CHECK ( birthdate < NOW() ),
+                                        join_date DATE DEFAULT CURRENT_DATE
+                                        CONSTRAINT nn_join_date NOT NULL)
                     """);
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS games (
@@ -108,6 +116,22 @@ public class PersistenceController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void savePlayer(Player player) {
+        try {
+            String query = "INSERT INTO players (name, birthdate) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, player.getName());
+            statement.setDate(2, player.getBirthdate());
+            statement.execute(query);
+        } catch (SQLException e) {
+            System.err.println(e.getMessage() + "\n-> Could not save player in the database!");
+        }
+    }
+
+    public Player loadPlayer(String name) {
+        return null;
     }
 
     public int getGameCount() {
