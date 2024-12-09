@@ -1,4 +1,6 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.view;
+
+import be.kdg.integration1.battleships_solitaire.entities.Board;
 
 public class SimpleMenu {
 

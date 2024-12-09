@@ -1,4 +1,4 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.entities;
 
 public class Tile {
     private int x;

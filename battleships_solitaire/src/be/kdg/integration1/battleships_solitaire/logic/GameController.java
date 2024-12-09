@@ -1,7 +1,17 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.logic;
+
+import be.kdg.integration1.battleships_solitaire.entities.Board;
+import be.kdg.integration1.battleships_solitaire.entities.Leaderboard;
+import be.kdg.integration1.battleships_solitaire.entities.Player;
+import be.kdg.integration1.battleships_solitaire.view.SimpleMenu;
 
 import java.util.Scanner;
 
+/**
+ * {@code GameController} maps out the responsibilities to the different entities and everything else in the system.
+ * It is to be used without any actual implemented logic.
+ * This class should only call other methods.
+ */
 public class GameController {
 
     private Board board;
@@ -11,13 +21,9 @@ public class GameController {
     private long startTime;
     private long endTime;
 
-    //Constructor
-    public GameController() {
-    }
-
     public void startGame(Board board , Player player , Leaderboard leaderboard , SimpleMenu menu) {
         Scanner scanner = new Scanner(System.in);
-        Game game = new Game();
+        BattleshipsSolitaire game = new BattleshipsSolitaire();
         // Place ships and generate tiles
         board.generateShips();
         board.generateTiles();
@@ -77,7 +83,8 @@ public class GameController {
 
             System.out.println("Another game? y/n");
             if (scanner.nextLine().charAt(0) == 'y') {
-                game.start(leaderboard);
+                //game.start(leaderboard);
+                /* TODO: reimplement this */
             }
         }
 

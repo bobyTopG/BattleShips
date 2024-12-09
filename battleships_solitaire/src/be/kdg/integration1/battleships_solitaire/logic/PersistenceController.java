@@ -1,9 +1,17 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.logic;
+
+import be.kdg.integration1.battleships_solitaire.entities.Board;
+import be.kdg.integration1.battleships_solitaire.entities.Player;
+import be.kdg.integration1.battleships_solitaire.entities.Tile;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * The class {@code PersistenceController} deals with everything related to the database.
+ * Here we can execute queries and fetch persistent data.
+ * Sometimes it is also called {@code Repository} in other projects.
+ */
 public class PersistenceController {
 
     public final String URL = "jdbc:postgresql://localhost:5432/";

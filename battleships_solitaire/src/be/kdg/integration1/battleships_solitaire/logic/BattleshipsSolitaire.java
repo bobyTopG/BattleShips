@@ -1,18 +1,43 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.logic;
+
+import be.kdg.integration1.battleships_solitaire.entities.Board;
+import be.kdg.integration1.battleships_solitaire.entities.Leaderboard;
+import be.kdg.integration1.battleships_solitaire.entities.Player;
+import be.kdg.integration1.battleships_solitaire.view.SimpleMenu;
+import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
+import be.kdg.integration1.battleships_solitaire.view.UIHandler;
 
 import java.util.Scanner;
 
-public class Game {
+/**
+ * {@code BattleshipsSolitaire} is where the game loop logic is kept.
+ * The game starts from here and the user is given choices and directions to play the game with.
+ */
+public class BattleshipsSolitaire {
 
     private Board board;
     private Player player;
     private SimpleMenu menu;
     private PersistenceController persistenceController;
 
+    private GameController gameController;
+    private UIHandler uiHandler;
 
-    public void start(Leaderboard leaderboard) {
+    public BattleshipsSolitaire() {
+        uiHandler = new TerminalUIHandler();
+    }
+
+    /**
+     * Begins the Battleships Solitaire game.
+     * Starts a loop with prompts to the user what to do next.
+     * {@link GameController}
+     */
+    public void start() {
+        uiHandler.showStartScreen();
+
+        Leaderboard leaderboard = null; // get this from
         Scanner scanner = new Scanner(System.in);
-        System.out.printf("\n\nWelcome to Battleships Solitaire Game! \nPlayer name: ");
+        System.out.printf("Welcome to Battleships Solitaire Game! \nPlayer name: ");
         String name = scanner.nextLine();
 
         player = new Player(name);

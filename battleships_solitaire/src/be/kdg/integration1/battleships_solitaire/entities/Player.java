@@ -1,28 +1,29 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.entities;
 
 import java.sql.Date;
 import java.time.LocalDate;
 
 public class Player {
 
-    private final int id;
+    private int id;
     private String name;
     private Date birthdate;
     private Date joindate;
 
-    public Player(int id, String name) {
-        this.id = id;
+    public Player(String name) {
         setName(name);
+        this.id = -1;
     }
 
-    public Player(int id, String name, Date birthdate) {
-        this(id, name);
+    public Player(String name, Date birthdate) {
+        this(name);
         setBirthdate(birthdate);
         setJoindate(Date.valueOf(LocalDate.now()));
     }
 
     public Player(int id, String name, Date birthdate, Date joindate) {
-        this(id, name, birthdate);
+        this(name, birthdate);
+        this.id = id;
         setJoindate(joindate);
     }
 

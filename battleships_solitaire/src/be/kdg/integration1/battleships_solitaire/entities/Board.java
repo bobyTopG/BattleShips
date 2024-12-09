@@ -1,4 +1,4 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.entities;
 
 import java.util.*;
 
@@ -10,6 +10,10 @@ public class Board {
     private Tile[][] playerTiles;
     private Tile[][] answerTiles;
     private List<Ship> ships;
+
+    public Board(int boardSize) {
+        this(-1, boardSize);
+    }
 
     public Board(int id, int boardSize) {
         this.id = id;

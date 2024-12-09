@@ -1,4 +1,4 @@
-package be.kdg.integration1.battleships_solitaire;
+package be.kdg.integration1.battleships_solitaire.entities;
 
 public enum ShipType {
     DESTROYER(2), SUBMARINE(3), BATTLESHIP(4), CARRIER(5);
