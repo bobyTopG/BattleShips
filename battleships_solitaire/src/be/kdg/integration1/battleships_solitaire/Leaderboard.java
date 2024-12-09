@@ -60,7 +60,7 @@ public class Leaderboard {
 
         // Add each player with formatted output
         for (Player player : players) {
-            sb.append(String.format("%-20s | Score: %-5d\n", player.getName(), player.getScore()));
+            sb.append(String.format("%-20s | Score: %-5d\n", player.getName(), 0/*player.getScore()*/));
         }
 
         // Add a footer line for cleanliness

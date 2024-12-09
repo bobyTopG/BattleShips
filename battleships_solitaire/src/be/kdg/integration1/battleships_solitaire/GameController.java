@@ -62,7 +62,7 @@ public class GameController {
             endTime = System.currentTimeMillis();
 
             if (!gameEnded) {
-                player.increaseScore(board.getBoardSize());
+                // player.increaseScore(board.getBoardSize());
                 System.out.println(leaderboard.toString());
             }
 
@@ -119,7 +119,7 @@ public class GameController {
         // Get and display the top player
         Player topPlayer = leaderboard.getTopPlayer();
         if (topPlayer != null) {
-            System.out.println("\nTop player: " + topPlayer.getName() + " with score: " + topPlayer.getScore());
+            System.out.println("\nTop player: " + topPlayer.getName() + " with score: " /*+ topPlayer.getScore()*/);
         }
 
     }
