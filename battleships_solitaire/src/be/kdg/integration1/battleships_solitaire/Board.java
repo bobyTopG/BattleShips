@@ -37,9 +37,9 @@ public class Board {
 
     public void generateShips() {
         Random rand = new Random();
-       // System.out.println("Generating ships...");
+        // System.out.println("Generating ships...");
 
-        while (ships.size() < boardSize) { // Add ships
+        while (ships.size() < boardSize / 2) { // Add ships
             ShipType shipType = ShipType.values()[rand.nextInt(ShipType.values().length)]; //Ensuring that a random ship type is chosen
             boolean isVertical = rand.nextBoolean();
             int x = rand.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
@@ -50,9 +50,9 @@ public class Board {
             if (canPlaceShip(newShip)) {
                 placeShip(newShip);
                 ships.add(newShip);
-               // System.out.println("Placed: " + shipType + " at (" + x + ", " + y + ")");
+                // System.out.println("Placed: " + shipType + " at (" + x + ", " + y + ")");
             } else {
-               // System.out.println("Failed to place: " + shipType + ", retrying...");
+                // System.out.println("Failed to place: " + shipType + ", retrying...");
             }
         }
     }
@@ -100,8 +100,8 @@ public class Board {
         return true;
     }
 
-    public void generateTiles(){
-       // System.out.println("Generating Tiles...");
+    public void generateTiles() {
+        // System.out.println("Generating Tiles...");
 
         Random rand = new Random();
         int placed = 0;
@@ -122,6 +122,7 @@ public class Board {
                 if (!tiles[i][j].isShip()) {
                     tiles[i][j].setShip(false);
                     tiles[i][j].setWater(true);
+                    tilesSolution[i][j].setRevealed(false);
 
                 }
             }
@@ -131,7 +132,7 @@ public class Board {
     public void makeTileAShip(int x, int y) {
         if (tilesSolution[x][y].isShip()) {
             System.out.println("There is already a ship");
-        } else if (tiles[x][y].isHint()) {
+        } else if (tiles[x][y].isHint() || tilesSolution[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("New ship added.");
@@ -142,7 +143,7 @@ public class Board {
     public void makeTileWater(int x, int y) {
         if (tilesSolution[x][y].isWater()) {
             System.out.println("This is already water");
-        } else if (tiles[x][y].isHint()) {
+        } else if (tiles[x][y].isHint() || tilesSolution[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("New water tile added.");
@@ -152,14 +153,14 @@ public class Board {
     }
 
     public void removeTile(int x, int y) {
-        if (tilesSolution[x][y].isShip() || tilesSolution[x][y].isWater() ) {
+        if (tilesSolution[x][y].isShip() || tilesSolution[x][y].isWater() && !tilesSolution[x][y].isRevealed()) {
             System.out.println("Removing ship part...");
             tilesSolution[x][y].setShip(false);
             tilesSolution[x][y].setWater(false);
 
-        } else if (tiles[x][y].isHint()) {
+        } else if (tiles[x][y].isHint() || tilesSolution[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
-        }else {
+        } else {
             System.out.println("No correction needed.");
         }
 
@@ -168,16 +169,32 @@ public class Board {
     public void revealTile() {
         Random rand = new Random();
         int x, y;
-        do {
-            x = rand.nextInt(boardSize);
-            y = rand.nextInt(boardSize);
-        } while (!tiles[x][y].isWater());
+        boolean revealedExist = false;
+        for (Tile[] row : tiles) {
+            for (Tile tile : row) {
+                if (!tile.isRevealed()) {
+                    revealedExist = true;
+                    break;
+                }
+            }
+            if (!revealedExist) {
+                System.out.println("Everything is revealed. :(");
+                break;
+            }
+        }
 
-        tilesSolution[x][y] = tiles[x][y];
+        if (revealedExist) {
+            do {
+                x = rand.nextInt(boardSize);
+                y = rand.nextInt(boardSize);
+            } while (!tiles[x][y].isWater());
 
-        System.out.printf("Revealed tile at X: %d, Y: %d\n", x+1, y+1);
+            tilesSolution[x][y] = tiles[x][y];
+            tilesSolution[x][y].setRevealed(true);
+
+            System.out.printf("Revealed tile at X: %d, Y: %d\n", x + 1, y + 1);
+        }
     }
-
     public int getBoardSize() {
         return boardSize;
     }
@@ -207,7 +224,7 @@ public class Board {
                 if (tile.isShip()) rowShipCount++;
 
                 // Append tile to grid
-                sb.append(tile.isShip() ? " □ " :(tile.isHint() ? " X " : " ~ "));
+                sb.append(tile.isShip() ? " □ " : (tile.isHint() ? " X " : " ~ "));
             }
 
             sb.append("| ").append(rowShipCount).append("\n"); // Add row ship count
@@ -255,7 +272,7 @@ public class Board {
                 if (tiles[i][j].isShip()) rowShipCount++;  // Increment ship count
 
                 // Append tile to the grid
-                sb.append(tile.isShip() ? " □ " : (tile.isHint() ? " X " :(tile.isWater() ? " ~ " :  " # ")));
+                sb.append(tile.isShip() ? " □ " : (tile.isHint() ? " X " : (tile.isWater() ? " ~ " : " # ")));
             }
             sb.append("| ").append(rowShipCount).append("\n");  // Append row ship count
         }

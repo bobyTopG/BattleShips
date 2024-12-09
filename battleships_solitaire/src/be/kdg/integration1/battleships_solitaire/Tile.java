@@ -6,6 +6,7 @@ public class Tile {
     private boolean isShip;
     private boolean isWater;
     private boolean isHint;
+    private boolean isRevealed;
 
 
 
@@ -14,6 +15,14 @@ public class Tile {
         this.x = x;
         this.y = y;
 
+    }
+
+    public boolean isRevealed() {
+        return isRevealed;
+    }
+
+    public void setRevealed(boolean revealed) {
+        isRevealed = revealed;
     }
 
     public int getX() {
