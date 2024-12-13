@@ -1,0 +1,4 @@
+/battleships_solitaire/src/be/kdg/integration1/battleships_solitaire/lib/
+out/
+.idea/
+*.iml
