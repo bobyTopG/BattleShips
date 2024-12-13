@@ -54,7 +54,6 @@ public class BattleshipsSolitaire {
             }
         } while (name.isEmpty() || !name.matches("[a-zA-Z]+"));
 
-
         player = new Player(name);
         menu = new SimpleMenu();
 
@@ -68,9 +67,10 @@ public class BattleshipsSolitaire {
 
         GameController gameController = new GameController();
         System.out.println("Choose your difficulty:");
-        System.out.printf("1 - %-7s (Board Size: %2d)%n", "Easy", Difficulty.EASY.getBoardSize());
-        System.out.printf("2 - %-7s (Board Size: %2d)%n", "Medium", Difficulty.MEDIUM.getBoardSize());
-        System.out.printf("3 - %-7s (Board Size: %2d)%n", "Hard", Difficulty.HARD.getBoardSize());
+        // this loops over all difficulties and prints them
+        for (Difficulty difficulty : Difficulty.values()) {
+            System.out.println(difficulty);
+        }
 
         // difficulty selection, checks if option is valid
         // if player enters anything other than an int, we catch the exception
