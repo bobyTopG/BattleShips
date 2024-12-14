@@ -75,19 +75,22 @@ public class BattleshipsSolitaire {
         // difficulty selection, checks if option is valid
         // if player enters anything other than an int, we catch the exception
         int option = 0;
+        final int LOWEST_DIFFICULTY = Difficulty.values()[0].getNumericValue();
+        final int HIGHEST_DIFFICULTY = Difficulty.values()[Difficulty.values().length - 1].getNumericValue();
+
         do {
             try {
                 System.out.print("Option number: ");
                 option = scanner.nextInt();
-                if (option < 1 || option > 3) {
-                    System.out.println("Invalid choice. Please select a difficulty between 1 and 3.");
+                if (option < LOWEST_DIFFICULTY || option > HIGHEST_DIFFICULTY) {
+                    System.out.printf("Invalid choice. Please select a difficulty between %d and %d.%n", LOWEST_DIFFICULTY, HIGHEST_DIFFICULTY);
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter the difficulty using a number between 1 and 3.");
+                System.out.printf("Invalid input. Please enter the difficulty using a number between %d and %d.%n", LOWEST_DIFFICULTY, HIGHEST_DIFFICULTY);
                 // remove the invalid input from the scanner, otherwise it keeps going on forever
                 scanner.nextLine();
             }
-        } while (option < 1 || option > 3);
+        } while (option < LOWEST_DIFFICULTY || option > HIGHEST_DIFFICULTY);
 
         // uses selected option to create new board
         // board size is determined by the board size defined in the Difficulty enum
