@@ -7,6 +7,7 @@ import java.util.Comparator;
 public class Leaderboard {
 
     private ArrayList<Player> players;
+    // TODO: private HashMap<Player, Integer> playerBestScores;
 
     public Leaderboard() {
         players = new ArrayList<>();

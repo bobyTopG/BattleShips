@@ -30,7 +30,7 @@ public class Board {
         this.ships = new ArrayList<>(shipAmount);
 
         while (ships.size() < shipAmount) { // Add ships
-            ShipType shipType = ShipType.values()[random.nextInt(ShipType.values().length)]; // Ensuring that a random ship type is chosen
+            Ship.Type shipType = Ship.Type.values()[random.nextInt(Ship.Type.values().length)]; // Ensuring that a random ship type is chosen
             boolean isVertical = random.nextBoolean();
             int x = random.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
             int y = random.nextInt(boardSize - (isVertical ? 0 : shipType.getSize()));
@@ -85,7 +85,7 @@ public class Board {
         for (int i = 0; i < size; i++) {
             int cx = isVertical ? x + i : x;
             int cy = isVertical ? y : y + i;
-            playerTiles[cx][cy].setShip(true);
+            playerTiles[cx][cy].markAs(Tile.Type.SHIP_PART);
         }
     }
 
@@ -117,9 +117,7 @@ public class Board {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 if (!playerTiles[i][j].isShip()) {
-                    playerTiles[i][j].setShip(false);
-                    playerTiles[i][j].setWater(true);
-                    answerTiles[i][j].setRevealed(false);
+                    playerTiles[i][j].markAs(Tile.Type.WATER);
                 }
             }
         }
@@ -145,7 +143,7 @@ public class Board {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("New ship added.");
-            answerTiles[x][y].setShip(true);
+            answerTiles[x][y].markAs(Tile.Type.SHIP_PART);
         }
     }
 
@@ -156,17 +154,14 @@ public class Board {
             System.out.println("Hey! There is hint :)");
         } else {
             System.out.println("New water tile added.");
-            answerTiles[x][y].setShip(false);
-            answerTiles[x][y].setWater(true);
+            answerTiles[x][y].markAs(Tile.Type.WATER);
         }
     }
 
     public void unmarkTile(int x, int y) {
         if (answerTiles[x][y].isShip() || answerTiles[x][y].isWater() && !answerTiles[x][y].isRevealed()) {
             System.out.println("Removing ship part...");
-            answerTiles[x][y].setShip(false);
-            answerTiles[x][y].setWater(false);
-
+            answerTiles[x][y].markAs(null);
         } else if (playerTiles[x][y].isHint() || answerTiles[x][y].isRevealed()) {
             System.out.println("Hey! There is hint :)");
         } else {
@@ -199,7 +194,7 @@ public class Board {
             } while (!playerTiles[x][y].isWater());
 
             answerTiles[x][y] = playerTiles[x][y];
-            answerTiles[x][y].setRevealed(true);
+            answerTiles[x][y].setRevealedAs(playerTiles[x][y].getType());
 
             System.out.printf("Revealed tile at X: %d, Y: %d\n", x + 1, y + 1);
         }

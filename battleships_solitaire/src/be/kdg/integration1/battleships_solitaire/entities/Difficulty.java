@@ -1,17 +1,21 @@
 package be.kdg.integration1.battleships_solitaire.entities;
 
 public enum Difficulty {
-    EASY(7, 1, "Easy"),
-    MEDIUM(10, 2, "Medium"),
-    HARD(15, 3, "Hard");
+    EASY(5, 5, 5, "Easy"),
+    MEDIUM(7, 2, 4, "Medium"),
+    HARD(9, 1, 1, "Hard");
 
     private final int BOARD_SIZE;
+    private final int PENALTY_POINTS;
+    private final int DEFAULT_HINTS;
     private final int NUMERIC_VALUE;
     private final String NAME;
 
-    Difficulty(int boardSize, int numericValue, String name) {
+    Difficulty(int boardSize, int penaltyPoints, int defaultHints, String name) {
         BOARD_SIZE = boardSize;
-        NUMERIC_VALUE = numericValue;
+        NUMERIC_VALUE = ordinal() + 1;
+        PENALTY_POINTS = penaltyPoints;
+        DEFAULT_HINTS = defaultHints;
         NAME = name;
     }
 
@@ -25,6 +29,14 @@ public enum Difficulty {
 
     public int getBoardSize() {
         return BOARD_SIZE;
+    }
+
+    public int getPenaltyPoints() {
+        return PENALTY_POINTS;
+    }
+
+    public int getDefaultHints() {
+        return DEFAULT_HINTS;
     }
 
     @Override
