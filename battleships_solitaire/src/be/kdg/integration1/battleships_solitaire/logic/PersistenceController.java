@@ -3,8 +3,10 @@ package be.kdg.integration1.battleships_solitaire.logic;
 import be.kdg.integration1.battleships_solitaire.entities.Board;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
 import be.kdg.integration1.battleships_solitaire.entities.Tile;
+import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -25,7 +27,7 @@ public class PersistenceController {
         try {
             connection = DriverManager.getConnection(URL + TABLE, USERNAME, PASSWORD);
             createTables();
-            System.out.println("There are " + getGameCount() + " game(s) in the database");
+            // System.out.println("There are " + getGameCount() + " saved game(s) in the database");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -133,7 +135,7 @@ public class PersistenceController {
             String query = "INSERT INTO players (name, birthdate) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, player.getName());
-            statement.setDate(2, player.getBirthdate());
+            statement.setDate(2, Date.valueOf(player.getBirthdate()));
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
@@ -153,11 +155,14 @@ public class PersistenceController {
                 return new Player(
                         resultSet.getInt("player_id"),
                         resultSet.getString("name"),
-                        resultSet.getDate("birthdate"),
-                        resultSet.getDate("join_date")
+                        resultSet.getDate("birthdate").toLocalDate(),
+                        resultSet.getDate("join_date").toLocalDate()
                 );
             } else {
-                return null;
+                // if there isn't such a Player yet, we just create it
+                LocalDate birthday = new TerminalUIHandler().askForBirthday();
+                savePlayer(new Player(name, birthday));
+                return fetchPlayer(name);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -176,8 +181,8 @@ public class PersistenceController {
                 return new Player(
                         resultSet.getInt("player_id"),
                         resultSet.getString("name"),
-                        resultSet.getDate("birthdate"),
-                        resultSet.getDate("join_date")
+                        resultSet.getDate("birthdate").toLocalDate(),
+                        resultSet.getDate("join_date").toLocalDate()
                 );
             } else {
                 return null;
@@ -228,7 +233,7 @@ public class PersistenceController {
         // TODO:? we can try to separate the queries into different methods
     }
 
-    public Board fetchGame(String name) {
+    public Board fetchGame(Player player) {
         Board board = null;
         /* TODO */
         return board;

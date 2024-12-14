@@ -9,9 +9,5 @@ import be.kdg.integration1.battleships_solitaire.logic.BattleshipsSolitaire;
 public class Application {
     public static void main(String[] args) {
         new BattleshipsSolitaire().start();
-//        Leaderboard leaderboard = new Leaderboard();
-//        new PersistenceController();
-//        BattleshipsSolitaire game = new BattleshipsSolitaire();
-//        game.start(leaderboard);
     }
 }

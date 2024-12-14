@@ -4,6 +4,8 @@ import be.kdg.integration1.battleships_solitaire.entities.Board;
 import be.kdg.integration1.battleships_solitaire.entities.Leaderboard;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
 import be.kdg.integration1.battleships_solitaire.view.SimpleMenu;
+import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
+import be.kdg.integration1.battleships_solitaire.view.UIHandler;
 
 import java.util.Scanner;
 
@@ -12,16 +14,29 @@ import java.util.Scanner;
  * It is to be used without any actual implemented logic.
  * This class should only call other methods.
  */
-public class GameController {
+public class GameSession {
 
+    private Player player;
     private Board board;
+    private UIHandler uiHandler;
     private PersistenceController persistenceController;
+    private SimpleMenu menu;
+
     boolean gameEnded = false;
     private Leaderboard leaderboard;
     private long startTime;
     private long endTime;
 
-    public void startGame(Board board , Player player , Leaderboard leaderboard , SimpleMenu menu) {
+    public GameSession(Player player) {
+        this.player = player;
+        uiHandler = new TerminalUIHandler();
+        board = uiHandler.startNewGame() ?
+                new Board(uiHandler.chooseDifficulty().getBoardSize()) :
+                persistenceController.fetchGame(player);
+        menu = new SimpleMenu();
+    }
+
+    public void startGame(/*Board board , Player player , Leaderboard leaderboard , SimpleMenu menu*/) {
         Scanner scanner = new Scanner(System.in);
         BattleshipsSolitaire game = new BattleshipsSolitaire();
         // Place ships and generate tiles

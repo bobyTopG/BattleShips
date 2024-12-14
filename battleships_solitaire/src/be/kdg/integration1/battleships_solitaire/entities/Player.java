@@ -7,41 +7,41 @@ public class Player {
 
     private int id;
     private String name;
-    private Date birthdate;
-    private Date joindate;
+    private LocalDate birthdate;
+    private LocalDate joindate;
 
     public Player(String name) {
         setName(name);
         this.id = -1;
     }
 
-    public Player(String name, Date birthdate) {
+    public Player(String name, LocalDate birthdate) {
         this(name);
         setBirthdate(birthdate);
-        setJoindate(Date.valueOf(LocalDate.now()));
+        setJoindate(LocalDate.now());
     }
 
-    public Player(int id, String name, Date birthdate, Date joindate) {
+    public Player(int id, String name, LocalDate birthdate, LocalDate joindate) {
         this(name, birthdate);
         this.id = id;
         setJoindate(joindate);
     }
 
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date birthdate) {
-        if (birthdate.after(Date.valueOf(LocalDate.now())))
+    public void setBirthdate(LocalDate birthdate) {
+        if (birthdate.isAfter(LocalDate.now()))
             throw new IllegalArgumentException("Birthdate cannot be after today!");
         this.birthdate = birthdate;
     }
 
-    public Date getJoindate() {
+    public LocalDate getJoindate() {
         return joindate;
     }
 
-    public void setJoindate(Date joindate) {
+    public void setJoindate(LocalDate joindate) {
         this.joindate = joindate;
     }
 
