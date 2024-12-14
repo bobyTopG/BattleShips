@@ -13,8 +13,8 @@ public class Ship {
         SUBMARINE(1),
         DESTROYER(2),
         CRUISER(3),
-        BATTLESHIP(4),
-        CARRIER(5);
+        BATTLESHIP(4);
+        // CARRIER(5);
 
         private final int size;
 
@@ -103,5 +103,13 @@ public class Ship {
                 "#".repeat(foundParts),
                 "_".repeat(remainingParts)
         );
+    }
+
+    public static int getShipAmountByDifficulty(Difficulty difficulty) {
+        return switch (difficulty) {
+            case EASY -> 5;
+            case MEDIUM -> 8;
+            case HARD -> 10;
+        };
     }
 }

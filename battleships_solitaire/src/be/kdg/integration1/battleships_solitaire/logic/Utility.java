@@ -10,4 +10,10 @@ public final class Utility {
         return c - 'A' + 1;
     }
 
+    public static void repeat(int n, Runnable action) {
+        for (int i = 0; i < n; i++) {
+            action.run();
+        }
+    }
+
 }

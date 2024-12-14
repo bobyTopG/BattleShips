@@ -33,15 +33,15 @@ public class GameSession {
         board = uiHandler.startNewGame() ?
                 new Board(uiHandler.chooseDifficulty().getBoardSize()) :
                 persistenceController.fetchGame(player);
-        menu = new SimpleMenu();
+        // menu = new SimpleMenu();
     }
 
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
         BattleshipsSolitaire game = new BattleshipsSolitaire();
         // Place ships and generate tiles
-        board.generateShips();
-        board.generateTiles();
+//        board.generateShips();
+//        board.generateTiles();
 
             startTime = System.currentTimeMillis();
             System.out.println(board);
@@ -84,7 +84,7 @@ public class GameSession {
 
             if (!gameEnded) {
                 // player.increaseScore(board.getBoardSize());
-                System.out.println(leaderboard.toString());
+                //System.out.println(leaderboard.toString());
             }
 
         if (gameEnded) {
@@ -94,7 +94,7 @@ public class GameSession {
             System.out.println("--------- You win =) ---------");
             System.out.println(getElapsedTime() + "\n");
         }
-            System.out.println(leaderboard.toString());
+            //System.out.println(leaderboard.toString());
 
             System.out.println("Another game? y/n");
             if (scanner.nextLine().charAt(0) == 'y') {

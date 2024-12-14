@@ -39,6 +39,15 @@ public enum Difficulty {
         return DEFAULT_HINTS;
     }
 
+    public static Difficulty valueOf(int boardSize) {
+        for (Difficulty d : Difficulty.values()) {
+            if (d.getBoardSize() == boardSize) {
+                return d;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return String.format("[%d] - %-6s | Board Size: %2d*%-2d", NUMERIC_VALUE, NAME, BOARD_SIZE, BOARD_SIZE);

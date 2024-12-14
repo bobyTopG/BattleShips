@@ -1,5 +1,7 @@
 package be.kdg.integration1.battleships_solitaire.entities;
 
+import static be.kdg.integration1.battleships_solitaire.logic.Utility.repeat;
+
 import java.util.*;
 
 public class Board {
@@ -20,28 +22,31 @@ public class Board {
         if (!(boardSize == 5 || boardSize == 7 || boardSize == 9))
             throw new IllegalArgumentException();
         this.boardSize = boardSize;
-        this.shipAmount = boardSize - 1;
+        this.shipAmount = Ship.getShipAmountByDifficulty(Difficulty.valueOf(boardSize));
         generateTiles();
         generateShips();
-        startUpTiles();
+        // startUpTiles();
+        System.out.println(this);
     }
 
     public void generateShips() {
         Random random = new Random();
         this.ships = new ArrayList<>(shipAmount);
+        List<Ship.Type> shipTypes = getShipTypes(Difficulty.valueOf(boardSize));
 
         // TODO: Implement difficulty logic, too
         while (ships.size() < shipAmount) { // Add ships
-            Ship.Type shipType = Ship.Type.values()[random.nextInt(Ship.Type.values().length)]; // Ensuring that a random ship type is chosen
+            Ship.Type shipType = shipTypes.getFirst();
             boolean isVertical = random.nextBoolean();
-            int x = random.nextInt(boardSize - (isVertical ? shipType.getSize() : 0)) + 1;
-            int y = random.nextInt(boardSize - (isVertical ? 0 : shipType.getSize())) + 1;
+            int x = random.nextInt(boardSize - (isVertical ? 0 : shipType.getSize())) + 1;
+            int y = random.nextInt(boardSize - (isVertical ? shipType.getSize() : 0)) + 1;
 
             Ship newShip = new Ship(x, y, shipType, isVertical);
 
             if (canPlaceShip(newShip)) {
                 placeShip(newShip);
                 ships.add(newShip);
+                shipTypes.removeFirst();
                 // System.out.println("Placed: " + shipType + " at (" + x + ", " + y + ")");
             } else {
                 // System.out.println("Failed to place: " + shipType + ", retrying...");
@@ -49,17 +54,37 @@ public class Board {
         }
     }
 
+    private List<Ship.Type> getShipTypes(Difficulty difficulty) {
+        // Generate a list of ship types there should be per difficulty
+        List<Ship.Type> shipTypes = new ArrayList<>(shipAmount);
+        switch (difficulty) {
+            case null: break;
+            case HARD:
+                shipTypes.add(Ship.Type.BATTLESHIP);
+                shipTypes.add(Ship.Type.CRUISER);
+            case MEDIUM:
+                shipTypes.add(Ship.Type.CRUISER);
+                shipTypes.add(Ship.Type.DESTROYER);
+                shipTypes.add(Ship.Type.SUBMARINE);
+            case EASY:
+            default:
+                repeat(2, () -> shipTypes.add(Ship.Type.DESTROYER));
+                repeat(3, () -> shipTypes.add(Ship.Type.SUBMARINE));
+        }
+        return shipTypes;
+    }
+
     private boolean canPlaceShip(Ship ship) {
         int size = ship.getSize();
-        int x = ship.getX();
-        int y = ship.getIntY();
+        int x = ship.getX() - 1;
+        int y = ship.getIntY() - 1;
         boolean isVertical = ship.isVertical();
 
         for (int i = 0; i < size; i++) {
             int cx = isVertical ? x + i : x;
             int cy = isVertical ? y : y + i;
 
-            if (cx >= boardSize || cy >= boardSize || playerTiles[cx - 1][cy - 1].isShip()) {
+            if (cx >= boardSize || cy >= boardSize || answerTiles[cx][cy].isShip()) {
                 return false; // Out of bounds or overlapping
             }
 
@@ -68,8 +93,9 @@ public class Board {
                 for (int dy = -1; dy <= 1; dy++) {
                     int adjX = cx + dx;
                     int adjY = cy + dy;
-                    if (adjX > 0 && adjX < boardSize && adjY > 0 && adjY < boardSize &&
-                            playerTiles[adjX - 1][adjY - 1].isShip()) {
+                    if (adjX > 0 && adjX < boardSize
+                            && adjY > 0 && adjY < boardSize
+                            && answerTiles[adjX][adjY].isShip()) {
                         return false; // Adjacent to another ship
                     }
                 }
@@ -81,13 +107,13 @@ public class Board {
 
     private void placeShip(Ship ship) {
         int size = ship.getSize();
-        int x = ship.getX();
-        int y = ship.getIntY();
+        int x = ship.getX() - 1;
+        int y = ship.getIntY() - 1;
         boolean isVertical = ship.isVertical();
         for (int i = 0; i < size; i++) {
             int cx = isVertical ? x + i : x;
             int cy = isVertical ? y : y + i;
-            playerTiles[cx][cy].markAs(Tile.Type.SHIP_PART);
+            answerTiles[cx][cy].markAs(Tile.Type.SHIP_PART);
         }
     }
 
@@ -97,8 +123,8 @@ public class Board {
         this.answerTiles = new Tile[boardSize][boardSize];
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                playerTiles[i][j] = new Tile(i, j);
-                answerTiles[i][j] = new Tile(i, j);
+                playerTiles[i][j] = new Tile(i + 1, j + 1);
+                answerTiles[i][j] = new Tile(i + 1, j + 1);
             }
         }
     }
@@ -265,46 +291,70 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        // First row and upper board line
+        sb.append(" ".repeat(4));
+        for (int x = 1; x <= boardSize; x++) {
+            sb.append(" ").append(x).append(" ");
+        }
+        sb.append("\n").append(" ".repeat(3));
+        sb.append("┌").append("─┴─".repeat(boardSize)).append("┐\n");
+        for (int y = 1; y <= boardSize; y++) {
+            sb.append(" ").append((char) ('A' + y - 1)).append(" ┤");
+            for (int x = 1; x <= boardSize; x++) {
+                sb.append(" ").append(answerTiles[x - 1][y - 1]).append(" ");
+            }
+            sb.append("│ ").append("0/1").append("\n");
+        }
+        sb.append("   └").append("───".repeat(boardSize)).append("┘\n");
+        sb.append("     ").append(String.format("%-3s", 0).repeat(boardSize)).append("\n");
 
-        // Add column numbers
-        sb.append("    ");
-        for (int col = 1; col <= boardSize; col++) {
-            sb.append(String.format("%2d ", col));
+        // Ships information
+        sb.append("Ships: ");
+        for (int i = 0; i < shipAmount; i++) {
+            sb.append(ships.get(i)).append(" ");
         }
         sb.append("\n");
 
-        // Add top border
-        sb.append("    ").append("- -".repeat(boardSize)).append(" -\n");
-
-        // Add grid with tiles and row ship counts
-        for (int i = 0; i < boardSize; i++) {
-            int rowShipCount = 0;  // Counter for ships in the row
-            sb.append(String.format("%2d |", i + 1));  // Row number
-
-            for (int j = 0; j < boardSize; j++) {
-                Tile tile = answerTiles[i][j];
-
-                if (playerTiles[i][j].isShip()) rowShipCount++;  // Increment ship count
-
-                // Append tile to the grid
-                sb.append(tile.isShip() ? " □ " : (tile.isHint() ? " X " : (tile.isWater() ? " ~ " : " # ")));
-            }
-            sb.append("| ").append(rowShipCount).append("\n");  // Append row ship count
-        }
-
-        // Add bottom border
-        sb.append("    ").append("- -".repeat(boardSize)).append(" -\n");
-
-        // Add column ship counts
-        sb.append("    ");
-        for (int j = 0; j < boardSize; j++) {
-            int colShipCount = 0;
-            for (int i = 0; i < boardSize; i++) {
-                if (playerTiles[i][j].isShip()) colShipCount++;
-            }
-            sb.append(String.format("%2d ", colShipCount));
-        }
-        sb.append("\n");
+//
+//        // Add column numbers
+//        sb.append("    ");
+//        for (int col = 1; col <= boardSize; col++) {
+//            sb.append(String.format("%2d ", col));
+//        }
+//        sb.append("\n");
+//
+//        // Add top border
+//        sb.append("    ").append("- -".repeat(boardSize)).append(" -\n");
+//
+//        // Add grid with tiles and row ship counts
+//        for (int i = 0; i < boardSize; i++) {
+//            int rowShipCount = 0;  // Counter for ships in the row
+//            sb.append(String.format("%2d |", i + 1));  // Row number
+//
+//            for (int j = 0; j < boardSize; j++) {
+//                Tile tile = answerTiles[i][j];
+//
+//                if (playerTiles[i][j].isShip()) rowShipCount++;  // Increment ship count
+//
+//                // Append tile to the grid
+//                sb.append(tile.isShip() ? " □ " : (tile.isHint() ? " X " : (tile.isWater() ? " ~ " : " # ")));
+//            }
+//            sb.append("| ").append(rowShipCount).append("\n");  // Append row ship count
+//        }
+//
+//        // Add bottom border
+//        sb.append("    ").append("- -".repeat(boardSize)).append(" -\n");
+//
+//        // Add column ship counts
+//        sb.append("    ");
+//        for (int j = 0; j < boardSize; j++) {
+//            int colShipCount = 0;
+//            for (int i = 0; i < boardSize; i++) {
+//                if (playerTiles[i][j].isShip()) colShipCount++;
+//            }
+//            sb.append(String.format("%2d ", colShipCount));
+//        }
+//        sb.append("\n");
 
         return sb.toString();
     }

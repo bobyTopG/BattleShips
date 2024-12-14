@@ -13,8 +13,8 @@ public class Tile {
 
     /** Enumeration for the types of ships **/
     public enum Type {
-        WATER(true),
-        SHIP_PART(false);
+        WATER(false),
+        SHIP_PART(true);
 
         private final boolean isShip;
 
@@ -109,7 +109,7 @@ public class Tile {
         return switch (type) {
             case WATER -> isRevealed ? "≈" : "~";
             case SHIP_PART -> isRevealed ? "#" : "X";
-            case null -> " ";
+            case null -> "·";
         };
     }
 }
