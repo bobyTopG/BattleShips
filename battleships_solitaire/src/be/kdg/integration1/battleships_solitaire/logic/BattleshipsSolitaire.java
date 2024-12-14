@@ -12,7 +12,6 @@ import be.kdg.integration1.battleships_solitaire.view.UIHandler;
  */
 public class BattleshipsSolitaire {
 
-    private Board board;
     private Player player;
 
     private GameSession gameSession;

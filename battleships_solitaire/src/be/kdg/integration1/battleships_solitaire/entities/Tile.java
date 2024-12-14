@@ -68,8 +68,12 @@ public class Tile {
         return x;
     }
 
-    public char getY() {
+    public char getCharY() {
         return y;
+    }
+
+    public int getIntY() {
+        return Utility.convertCoordinate(y);
     }
 
     public Type getType() {

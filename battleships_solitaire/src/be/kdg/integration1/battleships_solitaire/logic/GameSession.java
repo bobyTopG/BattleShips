@@ -36,7 +36,7 @@ public class GameSession {
         menu = new SimpleMenu();
     }
 
-    public void startGame(/*Board board , Player player , Leaderboard leaderboard , SimpleMenu menu*/) {
+    public void startGame() {
         Scanner scanner = new Scanner(System.in);
         BattleshipsSolitaire game = new BattleshipsSolitaire();
         // Place ships and generate tiles

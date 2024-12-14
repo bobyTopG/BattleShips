@@ -214,8 +214,8 @@ public class PersistenceController {
             for (Tile[] row : board.getPlayerTiles()) {
                 for (Tile tile : row) {
                     statement.setInt(1, board.getId());
-                    statement.setString(2, String.valueOf('A' + tile.getX() - 1));
-                    statement.setInt(3, tile.getY());
+                    statement.setInt(2, tile.getX());
+                    statement.setString(3, String.valueOf(tile.getCharY()));
                     if (tile.isShip() || tile.isWater()) {
                         statement.setBoolean(4, tile.isShip());
                     } else {

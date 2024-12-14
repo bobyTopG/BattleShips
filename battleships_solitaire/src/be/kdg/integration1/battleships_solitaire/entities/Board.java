@@ -21,19 +21,21 @@ public class Board {
             throw new IllegalArgumentException();
         this.boardSize = boardSize;
         this.shipAmount = boardSize - 1;
-        generateShips();
         generateTiles();
+        generateShips();
+        startUpTiles();
     }
 
     public void generateShips() {
         Random random = new Random();
         this.ships = new ArrayList<>(shipAmount);
 
+        // TODO: Implement difficulty logic, too
         while (ships.size() < shipAmount) { // Add ships
             Ship.Type shipType = Ship.Type.values()[random.nextInt(Ship.Type.values().length)]; // Ensuring that a random ship type is chosen
             boolean isVertical = random.nextBoolean();
-            int x = random.nextInt(boardSize - (isVertical ? shipType.getSize() : 0));
-            int y = random.nextInt(boardSize - (isVertical ? 0 : shipType.getSize()));
+            int x = random.nextInt(boardSize - (isVertical ? shipType.getSize() : 0)) + 1;
+            int y = random.nextInt(boardSize - (isVertical ? 0 : shipType.getSize())) + 1;
 
             Ship newShip = new Ship(x, y, shipType, isVertical);
 
@@ -50,14 +52,14 @@ public class Board {
     private boolean canPlaceShip(Ship ship) {
         int size = ship.getSize();
         int x = ship.getX();
-        int y = ship.getY();
+        int y = ship.getIntY();
         boolean isVertical = ship.isVertical();
 
         for (int i = 0; i < size; i++) {
             int cx = isVertical ? x + i : x;
             int cy = isVertical ? y : y + i;
 
-            if (cx >= boardSize || cy >= boardSize || playerTiles[cx][cy].isShip()) {
+            if (cx >= boardSize || cy >= boardSize || playerTiles[cx - 1][cy - 1].isShip()) {
                 return false; // Out of bounds or overlapping
             }
 
@@ -66,8 +68,8 @@ public class Board {
                 for (int dy = -1; dy <= 1; dy++) {
                     int adjX = cx + dx;
                     int adjY = cy + dy;
-                    if (adjX >= 0 && adjX < boardSize && adjY >= 0 && adjY < boardSize &&
-                            playerTiles[adjX][adjY].isShip()) {
+                    if (adjX > 0 && adjX < boardSize && adjY > 0 && adjY < boardSize &&
+                            playerTiles[adjX - 1][adjY - 1].isShip()) {
                         return false; // Adjacent to another ship
                     }
                 }
@@ -80,7 +82,7 @@ public class Board {
     private void placeShip(Ship ship) {
         int size = ship.getSize();
         int x = ship.getX();
-        int y = ship.getY();
+        int y = ship.getIntY();
         boolean isVertical = ship.isVertical();
         for (int i = 0; i < size; i++) {
             int cx = isVertical ? x + i : x;
@@ -90,7 +92,6 @@ public class Board {
     }
 
     public void generateTiles() {
-
         // System.out.println("Generating Tiles...");
         this.playerTiles = new Tile[boardSize][boardSize];
         this.answerTiles = new Tile[boardSize][boardSize];
@@ -100,7 +101,9 @@ public class Board {
                 answerTiles[i][j] = new Tile(i, j);
             }
         }
+    }
 
+    public void startUpTiles() {
         Random random = new Random();
         int placed = 0;
         while (placed < boardSize * 2) {
@@ -121,7 +124,6 @@ public class Board {
                 }
             }
         }
-
     }
 
     public boolean isGameOver() {

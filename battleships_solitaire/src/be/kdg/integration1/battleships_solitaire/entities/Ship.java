@@ -64,8 +64,12 @@ public class Ship {
         return x;
     }
 
-    public char getY() {
+    public char getCharY() {
         return y;
+    }
+
+    public int getIntY() {
+        return Utility.convertCoordinate(y);
     }
 
     public int getSize() {
