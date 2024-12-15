@@ -1,8 +1,6 @@
 package be.kdg.integration1.battleships_solitaire.logic;
 
-import be.kdg.integration1.battleships_solitaire.entities.Board;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
-import be.kdg.integration1.battleships_solitaire.view.SimpleMenu;
 import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
 import be.kdg.integration1.battleships_solitaire.view.UIHandler;
 
@@ -31,18 +29,28 @@ public class BattleshipsSolitaire {
     public void start() {
         uiHandler.showStartScreen();
         player = persistenceController.fetchPlayer(uiHandler.askForPlayerName());
+        uiHandler.welcomePlayer(player);
+        outerLoop:
+        do {
+            uiHandler.showMainMenu();
+            switch (uiHandler.getResponse()) {
+                case "P", "PLAY" -> {
+                    gameSession = new GameSession(player);
+                    gameSession.startGame();
+                }
+                case "H", "HELP" -> {
+                    uiHandler.showHelpScreen();
+                    uiHandler.awaitEnter();
+                }
+                case "L", "LEADERBOARD" -> {
+                    // uiHandler.showLeaderboard(persistenceController.fetchLeaderboard());
+                    uiHandler.awaitEnter();
+                }
+                case "E", "EXIT", "Q", "QUIT" -> {
+                    break outerLoop;
+                }
+            }
 
-        while (!"QUIT".equals(uiHandler.getResponse())) {
-            gameSession = new GameSession(player);
-            gameSession.startGame();
-        }
-
-        // TODO: we should DEFINITELY change this to something easier
-//        if (leaderboard.getPlayers().stream().anyMatch(p -> p.getName().equalsIgnoreCase(player.getName()))) {
-//            System.out.printf("%nWelcome back, %s! Happy to see you =) %n", player.getName());
-//        } else {
-//            leaderboard.addPlayer(player);
-//            System.out.printf("%nHello %s! You were added to the game =0 %n", player.getName());
-//        }
+        } while (!"S".equals(uiHandler.getResponse()));
     }
 }

@@ -1,6 +1,7 @@
 package be.kdg.integration1.battleships_solitaire.view;
 
 import be.kdg.integration1.battleships_solitaire.entities.Difficulty;
+import be.kdg.integration1.battleships_solitaire.entities.Player;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
@@ -36,6 +37,61 @@ public class TerminalUIHandler implements UIHandler {
     @Override
     public String getResponse() {
         return response;
+    }
+
+    @Override
+    public void showMainMenu() {
+        System.out.println("""
+                ┌───────────────────────────────────────┐
+                │          ┌─────────────────┐          │
+                │          │     Play [P]    │          │
+                │          └─────────────────┘          │
+                │          ┌─────────────────┐          │
+                │          │     Help [H]    │          │
+                │          └─────────────────┘          │
+                │          ┌─────────────────┐          │
+                │          │ Leaderboard [L] │          │
+                │          └─────────────────┘          │
+                │          ┌─────────────────┐          │
+                │          │  Exit/Quit [E]  │          │
+                │          └─────────────────┘          │
+                └───────────────────────────────────────┘""");
+        prompt("Make a choice");
+        switch (response) {
+            case "P", "PLAY" -> {
+                System.out.println("""
+                ┌───────────────────────────────────────┐
+                │          ┌─────────────────┐          │
+                │        > │     Play [P]    │ <        │
+                │          └─────────────────┘          │
+                └───────────────────────────────────────┘""");
+            }
+            case "H", "HELP" -> {
+                System.out.println("""
+                ┌───────────────────────────────────────┐
+                │          ┌─────────────────┐          │
+                │        > │     Help [H]    │ <        │
+                │          └─────────────────┘          │
+                └───────────────────────────────────────┘""");
+            }
+            case "L", "LEADERBOARD" -> {
+                System.out.println("""
+                ┌───────────────────────────────────────┐
+                │          ┌─────────────────┐          │
+                │        > │ Leaderboard [L] │ <        │
+                │          └─────────────────┘          │
+                └───────────────────────────────────────┘""");
+            }
+            case "E", "EXIT", "Q", "QUIT" -> {
+                System.out.println("""
+                ┌───────────────────────────────────────┐
+                │          ┌─────────────────┐          │
+                │        > │  Exit/Quit [E]  │ <        │
+                │          └─────────────────┘          │
+                └───────────────────────────────────────┘
+                Game quit!""");
+            }
+        }
     }
 
     @Override
@@ -97,26 +153,6 @@ public class TerminalUIHandler implements UIHandler {
             case 3 -> Difficulty.HARD;
             default -> null;
         };
-
-//        StringBuilder sb = new StringBuilder("Choose a difficulty [");
-//        Difficulty[] difficulties = Difficulty.values();
-//        // this loops over all difficulties and prints them
-//        for (int i = 0; i < difficulties.length - 1; i++) {
-//            sb.append(difficulties[i].getNumericValue())
-//                    .append(" - ").append(difficulties[i].name())
-//                    .append(", ");
-//        }
-//        sb.append(difficulties[difficulties.length - 1].getNumericValue())
-//                .append(" - ")
-//                .append(difficulties[difficulties.length - 1].name());
-//        sb.append("]");
-//        prompt(sb.toString());
-//        return switch (response) {
-//            case "1" -> Difficulty.EASY;
-//            case "2" -> Difficulty.MEDIUM;
-//            case "3" -> Difficulty.HARD;
-//            default -> Difficulty.valueOf(response);
-//        };
     }
 
     @Override
@@ -126,5 +162,23 @@ public class TerminalUIHandler implements UIHandler {
             prompt("What is your birthday? [YYYY-MM-DD]");
         } while (LocalDate.parse(response).isAfter(LocalDate.now()));
         return LocalDate.parse(response);
+    }
+
+    @Override
+    public void showHelpScreen() {
+        System.out.println("""
+                < Help Screen >
+                """);
+    }
+
+    @Override
+    public void welcomePlayer(Player player) {
+        System.out.println("Hello, " + player.getName() + "!");
+    }
+
+    @Override
+    public void awaitEnter() {
+        System.out.print("(Press ENTER to continue...)");
+        scanner.nextLine();
     }
 }

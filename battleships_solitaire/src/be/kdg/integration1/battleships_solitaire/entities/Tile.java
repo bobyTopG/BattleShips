@@ -37,8 +37,16 @@ public class Tile {
     private int x;
     private char y;
     /** If it is {@code null}, then the tile is unmarked.**/
-    private Type type;
-    private boolean isRevealed;
+    protected Type type;
+    private Ship ship;
+
+    public Ship getShip() {
+        return ship;
+    }
+
+    public void setShip(Ship ship) {
+        this.ship = ship;
+    }
 
     @Deprecated
     private boolean isHint;
@@ -51,17 +59,6 @@ public class Tile {
     public Tile(int x, int y) {
         this.x = x;
         this.y = Utility.convertCoordinate(y);
-    }
-
-    public boolean isRevealed() {
-        return isRevealed;
-    }
-
-    public void setRevealedAs(Type type) {
-        if (type == null)
-            throw new IllegalArgumentException("Revealed tile type cannot be null");
-        isRevealed = true;
-        this.type = type;
     }
 
     public int getX() {
@@ -99,16 +96,16 @@ public class Tile {
     }
 
     public void markAs(Type type) {
-        if (isRevealed)
-            throw new IllegalStateException("Tile is already revealed");
+        if (type == null)
+            throw new IllegalArgumentException("Basic tile type cannot be null");
         this.type = type;
     }
 
     @Override
     public String toString() {
         return switch (type) {
-            case WATER -> isRevealed ? "≈" : "~";
-            case SHIP_PART -> isRevealed ? "#" : "X";
+            case WATER -> "≈";
+            case SHIP_PART -> "#";
             case null -> "·";
         };
     }

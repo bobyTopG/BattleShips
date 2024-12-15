@@ -110,6 +110,7 @@ public class Ship {
             case EASY -> 5;
             case MEDIUM -> 8;
             case HARD -> 10;
+            case null -> 0;
         };
     }
 }
