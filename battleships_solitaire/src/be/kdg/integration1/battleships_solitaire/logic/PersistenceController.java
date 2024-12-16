@@ -160,8 +160,8 @@ public class PersistenceController {
                 );
             } else {
                 // if there isn't such a Player yet, we just create it
-                LocalDate birthday = new TerminalUIHandler().askForBirthday();
-                savePlayer(new Player(name, birthday));
+                LocalDate birthdate = new TerminalUIHandler().askForBirthdate();
+                savePlayer(new Player(name, birthdate));
                 return fetchPlayer(name);
             }
         } catch (SQLException e) {

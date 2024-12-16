@@ -2,6 +2,7 @@ package be.kdg.integration1.battleships_solitaire.entities;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class Player {
 
@@ -32,9 +33,11 @@ public class Player {
     }
 
     public void setBirthdate(LocalDate birthdate) {
-        if (birthdate.isAfter(LocalDate.now()))
+        if (birthdate.isAfter(LocalDate.now())){
             throw new IllegalArgumentException("Birthdate cannot be after today!");
-        this.birthdate = birthdate;
+        }
+            this.birthdate = birthdate;
+
     }
 
     public LocalDate getJoindate() {

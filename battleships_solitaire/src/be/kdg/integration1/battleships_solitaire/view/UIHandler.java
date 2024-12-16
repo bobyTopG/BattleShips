@@ -14,7 +14,7 @@ public interface UIHandler {
     void showStartScreen();
     /** @author Vivian K. */
     String askForPlayerName();
-    LocalDate askForBirthday();
+    LocalDate askForBirthdate();
     boolean startNewGame();
     Difficulty chooseDifficulty();
     String getResponse();

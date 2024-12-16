@@ -4,6 +4,7 @@ import be.kdg.integration1.battleships_solitaire.entities.Difficulty;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -156,12 +157,22 @@ public class TerminalUIHandler implements UIHandler {
     }
 
     @Override
-    public LocalDate askForBirthday() {
-        String birthday;
+    public LocalDate askForBirthdate() {
+        LocalDate birthdate = LocalDate.MAX;
         do {
-            prompt("What is your birthday? [YYYY-MM-DD]");
-        } while (LocalDate.parse(response).isAfter(LocalDate.now()));
-        return LocalDate.parse(response);
+            try {
+                prompt("What is your birthday? [YYYY-MM-DD]");
+                birthdate = LocalDate.parse(response);
+                if (birthdate.isAfter(LocalDate.now())) {
+                    throw new Exception("Future date");
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format! Please try again.");
+            } catch (Exception e) {
+                System.out.println("Birthdate cannot be in the future!");
+            }
+        }  while (birthdate.isAfter(LocalDate.now()));
+        return birthdate;
     }
 
     @Override
