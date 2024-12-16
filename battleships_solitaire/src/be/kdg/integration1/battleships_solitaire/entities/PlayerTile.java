@@ -18,22 +18,35 @@ public class PlayerTile extends Tile {
     public void setRevealedAs(Type type) {
         if (type == null)
             throw new IllegalArgumentException("Revealed tile type cannot be null");
+        markAs(type);
         isRevealed = true;
-        this.type = type;
     }
 
+    public boolean isWater() {
+        if (type == null) return false;
+        return !type.isShip();
+    }
+
+    /** @throws IllegalStateException */
     @Override
     public void markAs(Type type) {
         if (isRevealed)
             throw new IllegalStateException("Tile is already revealed");
         this.type = type;
+        if (getCorrespondingShip() != null) {
+            if (type == Type.SHIP_PART) {
+                getCorrespondingShip().decrementRemainingParts();
+            } else {
+                getCorrespondingShip().incrementRemainingParts();
+            }
+        }
     }
 
     @Override
     public String toString() {
         return switch (type) {
             case WATER -> isRevealed ? "≈" : "~";
-            case SHIP_PART -> isRevealed ? "#" : "X";
+            case SHIP_PART -> isRevealed ? "□" : "X";
             case null -> "·";
         };
     }

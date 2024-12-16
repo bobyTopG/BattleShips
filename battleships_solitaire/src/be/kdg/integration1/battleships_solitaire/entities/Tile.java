@@ -38,15 +38,7 @@ public class Tile {
     private char y;
     /** If it is {@code null}, then the tile is unmarked.**/
     protected Type type;
-    private Ship ship;
-
-    public Ship getShip() {
-        return ship;
-    }
-
-    public void setShip(Ship ship) {
-        this.ship = ship;
-    }
+    private Ship correspondingShip;
 
     @Deprecated
     private boolean isHint;
@@ -83,14 +75,24 @@ public class Tile {
     }
 
     public boolean isWater() {
-        if (type == null) return false;
+        if (type == null) return true;
         return !type.isShip;
     }
 
+    public void setCorrespondingShip(Ship correspondingShip) {
+        this.correspondingShip = correspondingShip;
+    }
+
+    public Ship getCorrespondingShip() {
+        return correspondingShip;
+    }
+
+    @Deprecated
     public boolean isHint() {
         return isHint;
     }
 
+    @Deprecated
     public void setHint(boolean isHint) {
         this.isHint = isHint;
     }
@@ -104,8 +106,8 @@ public class Tile {
     @Override
     public String toString() {
         return switch (type) {
-            case WATER -> "≈";
-            case SHIP_PART -> "#";
+            case WATER -> "~";
+            case SHIP_PART -> "■";
             case null -> "·";
         };
     }

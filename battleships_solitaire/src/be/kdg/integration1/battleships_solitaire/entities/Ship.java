@@ -6,7 +6,7 @@ import be.kdg.integration1.battleships_solitaire.logic.Utility;
  * {@code Ship} is used to represent the ships in the game
  * and when fetching them from the database.
  */
-public class Ship {
+public class Ship implements Comparable<Ship> {
 
     /** Enumeration for the types of ships **/
     public enum Type {
@@ -97,11 +97,17 @@ public class Ship {
     }
 
     @Override
+    public int compareTo(Ship ship) {
+        if (ship == null) return 1;
+        return ship.getSize() - this.getSize();
+    }
+
+    @Override
     public String toString() {
         int foundParts = type.size - remainingParts;
         return String.format("%s%s",
-                "#".repeat(foundParts),
-                "_".repeat(remainingParts)
+                "■".repeat(foundParts),
+                "□".repeat(remainingParts)
         );
     }
 

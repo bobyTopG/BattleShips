@@ -18,8 +18,13 @@ public interface UIHandler {
     boolean startNewGame();
     Difficulty chooseDifficulty();
     String getResponse();
+    void setResponse(String response);
     void showMainMenu();
+    void showPlayingOptions();
     void showHelpScreen();
     void welcomePlayer(Player player);
     void awaitEnter();
+    int chooseX(int limit);
+    char chooseY(int limit);
+    void endOfGame();
 }

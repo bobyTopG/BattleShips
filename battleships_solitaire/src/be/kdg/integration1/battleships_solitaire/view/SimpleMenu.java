@@ -30,7 +30,8 @@ public class SimpleMenu {
     }
 
     public String stopAndRevtileTiles(Board board) {
-        return board.printAnswer();
+//        return board.printAnswer();
+        return null;
     }
 
 }

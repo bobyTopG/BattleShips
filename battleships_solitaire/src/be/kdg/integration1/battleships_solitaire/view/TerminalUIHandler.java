@@ -2,6 +2,7 @@ package be.kdg.integration1.battleships_solitaire.view;
 
 import be.kdg.integration1.battleships_solitaire.entities.Difficulty;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
+import be.kdg.integration1.battleships_solitaire.logic.Utility;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -38,6 +39,11 @@ public class TerminalUIHandler implements UIHandler {
     @Override
     public String getResponse() {
         return response;
+    }
+
+    @Override
+    public void setResponse(String response) {
+        this.response = response;
     }
 
     @Override
@@ -96,6 +102,12 @@ public class TerminalUIHandler implements UIHandler {
     }
 
     @Override
+    public void showPlayingOptions() {
+        System.out.println("Mark [W]ater | [M]ark Ship | [U]nmark tile | [R]eveal tile | [S]ave game | [E]xit game");
+        prompt("Your move ");
+    }
+
+    @Override
     public String askForPlayerName() {
         String name;
         // validate the name by checking if it's either empty or contains characters that aren't letters
@@ -135,7 +147,7 @@ public class TerminalUIHandler implements UIHandler {
         do {
             try {
                 System.out.print("Option number: ");
-                option = scanner.nextInt();
+                option = Integer.parseInt(scanner.nextLine());
                 if (option < LOWEST_DIFFICULTY || option > HIGHEST_DIFFICULTY) {
                     System.out.printf("Invalid choice. Please select a difficulty between %d and %d.%n", LOWEST_DIFFICULTY, HIGHEST_DIFFICULTY);
                 }
@@ -192,4 +204,39 @@ public class TerminalUIHandler implements UIHandler {
         System.out.print("(Press ENTER to continue...)");
         scanner.nextLine();
     }
+
+    @Override
+    public int chooseX(int limit) {
+        int x = -1;
+        do {
+            prompt("Choose column [1..]");
+            try {
+                x = Integer.parseInt(response);
+            } catch (NumberFormatException e) {
+                System.out.println("You have to give a number!");
+            }
+        } while (Utility.isXNotInBounds(x, limit));
+        return x;
+    }
+
+    @Override
+    public char chooseY(int limit) {
+        char y = '\0';
+        do {
+            prompt("Choose row [A..]");
+            if (getResponse().length() != 1) {
+                System.out.println("Enter only one character!");
+                continue;
+            }
+            y = getResponse().charAt(0);
+        } while (Utility.isYNotInBounds(y, limit));
+        return y;
+    }
+
+    @Override
+    public void endOfGame() {
+        System.out.println("Game finished!");
+    }
+
+
 }

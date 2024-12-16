@@ -45,7 +45,7 @@ public enum Difficulty {
                 return d;
             }
         }
-        return null;
+        return EASY;
     }
 
     @Override

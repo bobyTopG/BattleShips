@@ -30,27 +30,30 @@ public class BattleshipsSolitaire {
         uiHandler.showStartScreen();
         player = persistenceController.fetchPlayer(uiHandler.askForPlayerName());
         uiHandler.welcomePlayer(player);
-        outerLoop:
         do {
-            uiHandler.showMainMenu();
-            switch (uiHandler.getResponse()) {
-                case "P", "PLAY" -> {
-                    gameSession = new GameSession(player);
-                    gameSession.startGame();
-                }
-                case "H", "HELP" -> {
-                    uiHandler.showHelpScreen();
-                    uiHandler.awaitEnter();
-                }
-                case "L", "LEADERBOARD" -> {
-                    // uiHandler.showLeaderboard(persistenceController.fetchLeaderboard());
-                    uiHandler.awaitEnter();
-                }
-                case "E", "EXIT", "Q", "QUIT" -> {
-                    break outerLoop;
-                }
-            }
-
+            selectChoice();
         } while (!"S".equals(uiHandler.getResponse()));
+    }
+
+    public void selectChoice() {
+        uiHandler.showMainMenu();
+        switch (uiHandler.getResponse()) {
+            case "P", "PLAY", "1" -> {
+                gameSession = new GameSession(player);
+                gameSession.startGame();
+                uiHandler.awaitEnter();
+            }
+            case "H", "HELP", "2" -> {
+                uiHandler.showHelpScreen();
+                uiHandler.awaitEnter();
+            }
+            case "L", "LEADERBOARD", "3" -> {
+                // uiHandler.showLeaderboard(persistenceController.fetchLeaderboard());
+                uiHandler.awaitEnter();
+            }
+            case "E", "EXIT", "Q", "QUIT", "4" -> {
+                uiHandler.setResponse("S");
+            }
+        }
     }
 }
