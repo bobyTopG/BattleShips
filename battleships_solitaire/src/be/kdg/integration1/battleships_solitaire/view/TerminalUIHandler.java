@@ -13,6 +13,7 @@ public class TerminalUIHandler implements UIHandler {
 
     private final Scanner scanner;
     private String response;
+    private final int NAME_MAX_CHARACTERS = 12;
 
     public TerminalUIHandler() {
         this.scanner = new Scanner(System.in);
@@ -114,13 +115,15 @@ public class TerminalUIHandler implements UIHandler {
         // the regex is matching all lowercase and uppercase letters with at least 1 occurrence
         do {
             System.out.print("Please enter your name: ");
-            name = scanner.nextLine();
+            name = scanner.nextLine().trim();
             if (name.isEmpty()) {
                 System.out.println("Name can't be empty. Please try again!");
             } else if (!name.matches("[a-zA-Z]+")) {
                 System.out.println("Your name may only contain letters. Please try again!");
+            } else if (name.length() > NAME_MAX_CHARACTERS){
+                System.out.println("Your name cannot be longer than 12 characters. Please try again!");
             }
-        } while (name.isEmpty() || !name.matches("[a-zA-Z]+"));
+        } while (name.isEmpty() || !name.matches("[a-zA-Z]+") || name.length() > NAME_MAX_CHARACTERS);
         return name.toUpperCase();
     }
 

@@ -1,8 +1,6 @@
 package be.kdg.integration1.battleships_solitaire.logic;
 
-import be.kdg.integration1.battleships_solitaire.entities.Board;
-import be.kdg.integration1.battleships_solitaire.entities.Player;
-import be.kdg.integration1.battleships_solitaire.entities.Tile;
+import be.kdg.integration1.battleships_solitaire.entities.*;
 import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
 
 import java.sql.*;
@@ -251,5 +249,90 @@ public class PersistenceController {
         }
         return gameCount;
     }
+
+    public void loadLeaderBoard() {
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT p.name, g.end, g.duration, g.score FROM games g " +
+                                                         "JOIN players p ON p.player_id = g.player_id ORDER BY g.score FETCH FIRST 5 ROWS ONLY");
+            while (resultSet.next()) {
+                String playerName = resultSet.getString(1);
+                Date gameDate = resultSet.getDate(2);
+                int duration = resultSet.getInt(3);
+                int score = resultSet.getInt(4);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Leaderboard could not be loaded!");
+
+        }
+
+    }
+
+    // give resultset for fetch methods of the leaderboard
+    public void fetchFromLeaderBoard(PreparedStatement statement) {
+        try {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String playerName = resultSet.getString(1);
+                Date gameDate = resultSet.getDate(2);
+                int duration = resultSet.getInt(3);
+                int score = resultSet.getInt(4);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Data could not be retrieved from leaderboard!");
+        }
+    }
+
+    //get leaderboard per person
+    public void fetchLeaderBoardByName(String name) {
+        try {
+            name = name.toUpperCase();
+            String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+                           "JOIN players p ON p.player_id = g.player_id  WHERE p.name = ? " +
+                           "ORDER BY g.score FETCH FIRST 5 ROWS ONLY";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, name);
+            fetchFromLeaderBoard(statement);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Player scores could not be retrieved!");
+        }
+    }
+    //get leaderboard for difficulties based on boardSize
+    public void fetchLeaderBoardByDifficulty(int boardSize) {
+        try {
+            String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+                           "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? " +
+                           "ORDER BY g.score FETCH FIRST 5 ROWS ONLY";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, boardSize);
+            fetchFromLeaderBoard(statement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Leaderboard of difficulty could not be retrieved!");
+        }
+
+    }
+    //TODO error handling
+    //get leaderboard for difficulties based on name
+    public void fetchLeaderBoardByDifficulty(String difficultyName) {
+        try {
+            int boardSize = Difficulty.valueOf(difficultyName.toUpperCase()).getBoardSize();
+            String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+                           "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? " +
+                           "ORDER BY g.score FETCH FIRST 5 ROWS ONLY";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, boardSize);
+            fetchFromLeaderBoard(statement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Leaderboard of difficulty could not be retrieved!");
+        }
+
+    }
+
 
 }
