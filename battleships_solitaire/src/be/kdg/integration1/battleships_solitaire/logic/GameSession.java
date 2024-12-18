@@ -3,14 +3,11 @@ package be.kdg.integration1.battleships_solitaire.logic;
 import be.kdg.integration1.battleships_solitaire.entities.Board;
 import be.kdg.integration1.battleships_solitaire.entities.Leaderboard;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
-import be.kdg.integration1.battleships_solitaire.view.SimpleMenu;
 import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
 import be.kdg.integration1.battleships_solitaire.view.UIHandler;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Scanner;
 
 /**
  * {@code GameController} maps out the responsibilities to the different entities and everything else in the system.
@@ -24,19 +21,16 @@ public class GameSession {
     private UIHandler uiHandler;
     private PersistenceController persistenceController;
 
-    String shorthandCommand;
-    boolean isShorthandUsed;
-    boolean isNewGame;
-    private Leaderboard leaderboard;
+    private String shorthandCommand;
+    private boolean isShorthandUsed;
+    private boolean isNewGame;
 
-    private LocalDateTime currentStartTime;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private Duration duration;
+    private Leaderboard leaderboard;
 
     public GameSession(Player player) {
         this.player = player;
         uiHandler = new TerminalUIHandler();
+        persistenceController = new PersistenceController();
         isNewGame = uiHandler.startNewGame();
         board = isNewGame ?
                 new Board(uiHandler.chooseDifficulty().getBoardSize()) :
@@ -44,22 +38,25 @@ public class GameSession {
     }
 
     public void startGame() {
+        board.setCurrentTime(LocalDateTime.now());
+        if (isNewGame) {
+            board.setStartTime(board.getCurrentTime());
+            board.setDuration(Duration.ZERO);
+        }
         loop:
         while (!board.isGameOver()) {
             System.out.println(board);
             uiHandler.showPlayingOptions();
-//            if (uiHandler.getResponse().length() == 3) {
-//                isShorthandUsed = true;
-//                uiHandler.setResponse("W");
-//            } else {}
             int x = -1;
             char y = '\0';
+
             String response = uiHandler.getResponse();
             if (response.length() == 3) {
                 shorthandCommand = response.substring(1);
                 response = String.valueOf(uiHandler.getResponse().charAt(0));
                 isShorthandUsed = true;
             }
+
             switch (response) {
                 case "W", "WATER", "X", "M", "SHIP", "U", "UNMARK" -> {
                     if (isShorthandUsed) {
@@ -84,13 +81,14 @@ public class GameSession {
                     }
                 }
                 case "S", "SAVE" -> {
-                    System.out.println("Saving game?");
+                    // TODO: save the game in the database
                     continue;
                 }
                 case "E", "EXIT", "END" -> {
                     break loop;
                 }
             }
+
             switch (response) {
                 case "W", "WATER"       -> board.markTileAsWater(x - 1, Utility.convertCoordinate(y) - 1);
                 case "M", "SHIP", "X"   -> board.markTileAsShip(x - 1, Utility.convertCoordinate(y) - 1);
@@ -98,77 +96,15 @@ public class GameSession {
                 case "R", "REVEAL"      -> board.revealRandomTile();
             }
             isShorthandUsed = false;
+            board.updateDuration();
         }
         if (board.isGameOver()) {
             uiHandler.endOfGame();
+            board.setDuration(Duration.ZERO);
             System.out.println(board.answersToString());
+            // TODO: save the game in the database
         }
     }
-
-
-//        // Place ships and generate tiles
-////        board.generateShips();
-////        board.generateTiles();
-//
-//            startTime = System.currentTimeMillis();
-//            System.out.println(board);
-//            boolean gameEnded = false;
-//
-//            while (!board.isGameOver() && !gameEnded) {
-//                System.out.print(menu.menuOptions());
-//
-//                char command = scanner.nextLine().charAt(0);
-//
-//                if (command == 'a' || command == 's' || command == 'r') {
-//                    System.out.print(" X: ");
-//                    int x = Integer.parseInt(scanner.nextLine()) - 1;
-//                    System.out.print(" Y: ");
-//                    int y = Integer.parseInt(scanner.nextLine()) - 1;
-//
-//                    if (command == 's') {
-//                        menu.tileToWater(board, x, y);
-//                    } else if (command == 'r') {
-//                        menu.removeTile(board, x, y);
-//                    } else {
-//                        menu.addShip(board, x, y);
-//                    }
-//                    System.out.println(board);
-//                } else if (command == 'e') {
-//                    System.out.print(menu.stopAndRevtileTiles(board));
-//                    gameEnded = true;
-//                } else if (command == 'h') {
-//                    System.out.printf(menu.help());
-//                } else if (command == 'l') {
-//                    board.revealRandomTile();
-//                    System.out.println(board);
-//                } else {
-//                    System.out.println("Invalid command");
-//                }
-//
-//            }
-//
-//            endTime = System.currentTimeMillis();
-//
-//            if (!gameEnded) {
-//                // player.increaseScore(board.getBoardSize());
-//                //System.out.println(leaderboard.toString());
-//            }
-//
-//        if (gameEnded) {
-//            System.out.println("\n--------- Game Over ---------");
-//            System.out.println("Hey! Next time don't quit =(\n");
-//        } else {
-//            System.out.println("--------- You win =) ---------");
-//            System.out.println(getElapsedTime() + "\n");
-//        }
-//            //System.out.println(leaderboard.toString());
-//
-//            System.out.println("Another game? y/n");
-//            if (scanner.nextLine().charAt(0) == 'y') {
-//                //game.start(leaderboard);
-//                /* TODO: reimplement this */
-//            }
-//        }
 
 
 //    public void loadLeaderBoard() {
@@ -210,13 +146,3 @@ public class GameSession {
 //
 //}
 }
-
-//+selectPlayer(String)
-//+startGame(int difficulty)
-//+endGame()
-//+saveGame()
-//+loadGame()
-//+loadPlayer()
-//+loadLeaderBoard()
-//+markTile()
-//+showCredits()

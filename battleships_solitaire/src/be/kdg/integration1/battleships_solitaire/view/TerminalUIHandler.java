@@ -190,7 +190,15 @@ public class TerminalUIHandler implements UIHandler {
     @Override
     public void showHelpScreen() {
         System.out.println("""
-                < Help Screen >
+                
+                How to play the game? - The game is simple. You have to guess where the ships are starting with a handful of revealed tiles (hints). Each tile is either water or a ship part. Per column and row you will find how many ship pieces are found. Underneath the board you will find a list of the ships and the progress of revealing them. Above the board you will see your score and time passed since the game started.
+                
+                How to use the controls? - The game is made to be as intuitive as possible so just follow the menus. When you have made a choice just type in the corresponding letter and press ENTER.
+                
+                What is what on the board? - The letters correspond to a column meanwhile the numbers on the left correspond to a row. Squares are ship pieces that are revealed to you by the game, same goes for the double squiggly line. The singular squiggly line represents water, while an X represents where you have marked a tile as a ship piece.
+                
+                If you have any more questions about the game, just contact its authors.
+                And don't forget to have fun!
                 """);
     }
 
@@ -237,6 +245,5 @@ public class TerminalUIHandler implements UIHandler {
     public void endOfGame() {
         System.out.println("Game finished!");
     }
-
 
 }

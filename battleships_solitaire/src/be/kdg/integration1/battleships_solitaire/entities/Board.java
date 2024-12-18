@@ -11,11 +11,12 @@ public class Board {
     private final int id;
     private final int boardSize;
     private final int shipAmount;
+    private int score;
     private PlayerTile[][] playerTiles;
     private Tile[][] answerTiles;
     private List<Ship> ships;
 
-    private LocalDateTime currentStartTime;
+    private LocalDateTime currentTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Duration duration;
@@ -31,18 +32,24 @@ public class Board {
         this.boardSize = boardSize;
         this.shipAmount = Ship.getShipAmountByDifficulty(Difficulty.valueOf(boardSize));
         System.out.print("Generating board ");
-        generateTiles();
-        System.out.print(".");
-        generateShips();
-        System.out.print(".");
+        generate();
         revealHints();
-        System.out.println(".");
+        System.out.println(" .");
+        score = Difficulty.valueOf(boardSize).getStartingPoints();
+    }
+
+    public void generate() {
+        generateTiles();
+        generateShips();
     }
 
     public void generateShips() {
         Random random = new Random();
         this.ships = new ArrayList<>(shipAmount);
         List<Ship.Type> shipTypes = getShipTypes(Difficulty.valueOf(boardSize));
+
+        int attempts = 0;
+        final int MAX_ATTEMPTS = 32;
 
         while (ships.size() < shipAmount) { // Add ships
             Ship.Type shipType = shipTypes.getFirst();
@@ -57,8 +64,17 @@ public class Board {
                 ships.add(newShip);
                 shipTypes.removeFirst();
                 System.out.print(".");
+                attempts = 0;
             } else {
                 System.out.print("_");
+                attempts++;
+            }
+
+            // if it takes too many attempts just restart the generation process
+            if (attempts >= MAX_ATTEMPTS) {
+                System.out.println(",");
+                generate();
+                break;
             }
         }
     }
@@ -184,6 +200,9 @@ public class Board {
         try {
             playerTiles[x][y].setCorrespondingShip(answerTiles[x][y].getCorrespondingShip());
             playerTiles[x][y].markAs(Tile.Type.SHIP_PART);
+            // SCORE: If the player guess this ship pieces right, they will earn 2 points,
+            // or else they will lose 1 point
+            score += answerTiles[x][y].getType() == Tile.Type.SHIP_PART ? 2 : -1;
         } catch (IllegalStateException e) {
             System.out.println("You cannot mark an already revealed tile.");
         }
@@ -193,6 +212,9 @@ public class Board {
         try {
             playerTiles[x][y].setCorrespondingShip(null);
             playerTiles[x][y].markAs(Tile.Type.WATER);
+            // SCORE: If the player guesses this water tile, they will earn 1 point,
+            // or else they will lose 1 point
+            score += answerTiles[x][y].getType() == Tile.Type.WATER ? 1 : -1;
         } catch (IllegalStateException e) {
             System.out.println("You cannot mark an already revealed tile.");
         }
@@ -200,6 +222,14 @@ public class Board {
 
     public void unmarkTile(int x, int y) {
         try {
+            // SCORE: If the player unmarks a tile the score resets
+            if (playerTiles[x][y].getType() != null) {
+                if (playerTiles[x][y].getType() == answerTiles[x][y].getType()) {
+                    score -= answerTiles[x][y].getType() == Tile.Type.SHIP_PART ? 2 : 1;
+                } else {
+                    score++;
+                }
+            }
             playerTiles[x][y].setCorrespondingShip(null);
             playerTiles[x][y].markAs(null);
         } catch (IllegalStateException e) {
@@ -210,20 +240,17 @@ public class Board {
     public void revealRandomTile() {
         Random rand = new Random();
         int x, y;
-        while (true) {
+        do {
             x = rand.nextInt(boardSize);
             y = rand.nextInt(boardSize);
-            if (!playerTiles[x][y].isRevealed()
-                    && playerTiles[x][y].getType()
-                    != answerTiles[x][y].getType()) {
-                break;
-            }
-        }
+        } while (playerTiles[x][y].isRevealed()
+                || playerTiles[x][y].getType() == answerTiles[x][y].getType());
         System.out.println(playerTiles[x][y].getType() != null
                 ? "Fixed a tile."
                 : "Revealed a tile.");
         playerTiles[x][y].setCorrespondingShip(answerTiles[x][y].getCorrespondingShip());
         playerTiles[x][y].setRevealedAs(answerTiles[x][y].getType());
+        score -= 2;
     }
 
     private int getMarkedShipsInColumn(Tile[][] tiles, int x) {
@@ -258,6 +285,44 @@ public class Board {
         return playerTiles;
     }
 
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void updateDuration() {
+        Duration currentDuration = Duration.between(currentTime, LocalDateTime.now());
+        currentTime = LocalDateTime.now();
+        duration = duration.plus(currentDuration);
+    }
+
+    public LocalDateTime getCurrentTime() {
+        return currentTime;
+    }
+
+    public void setCurrentTime(LocalDateTime currentTime) {
+        this.currentTime = currentTime;
+    }
+
     @Override
     public String toString() {
         return tilesToString(playerTiles);
@@ -269,6 +334,17 @@ public class Board {
 
     public String tilesToString(Tile[][] tiles) {
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format(
+                "\n\n[%s] Score: \033[1;33m%d\033[0m\n",
+                Difficulty.valueOf(boardSize).getName().toUpperCase(),
+                score
+        ));
+        sb.append(String.format(
+                "Game duration: %02dh:%02dm:%02ds\n",
+                duration.toHours(),
+                duration.toMinutesPart(),
+                duration.toSecondsPart()
+        ));
         // First row and upper board line
         sb.append(" ".repeat(4));
         for (int x = 1; x <= boardSize; x++) {
@@ -297,8 +373,11 @@ public class Board {
 
         // Ships information
         sb.append("Ships: ");
+        int lastShipSize = ships.getFirst().getSize();
         for (int i = 0; i < shipAmount; i++) {
+            sb.append(lastShipSize == ships.get(i).getSize() ? "" : "| ");
             sb.append(ships.get(i)).append(" ");
+            lastShipSize = ships.get(i).getSize();
         }
         sb.append("\n");
 

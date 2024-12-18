@@ -1,7 +1,6 @@
 package be.kdg.integration1.battleships_solitaire;
 
 import be.kdg.integration1.battleships_solitaire.logic.BattleshipsSolitaire;
-import be.kdg.integration1.battleships_solitaire.logic.Utility;
 
 /**
  * This class only has the {@code main()} method used to start up the program.
