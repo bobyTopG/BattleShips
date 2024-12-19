@@ -16,16 +16,15 @@ import java.time.LocalDateTime;
  */
 public class GameSession {
 
-    private Player player;
-    private Board board;
-    private UIHandler uiHandler;
-    private PersistenceController persistenceController;
+    private final Player player;
+    private final Board board;
+    private Leaderboard leaderboard;
+    private final UIHandler uiHandler;
+    private final PersistenceController persistenceController;
 
     private String shorthandCommand;
     private boolean isShorthandUsed;
-    private boolean isNewGame;
-
-    private Leaderboard leaderboard;
+    private final boolean isNewGame;
 
     public GameSession(Player player) {
         this.player = player;
@@ -99,10 +98,10 @@ public class GameSession {
             }
 
             switch (response) {
-                case "W", "WATER"       -> board.markTileAsWater(x - 1, Utility.convertCoordinate(y) - 1);
-                case "M", "SHIP", "X"   -> board.markTileAsShip(x - 1, Utility.convertCoordinate(y) - 1);
-                case "U", "UNMARK"      -> board.unmarkTile(x - 1, Utility.convertCoordinate(y) - 1);
-                case "R", "REVEAL"      -> board.revealRandomTile();
+                case "W", "WATER"     -> board.markTileAsWater(x - 1, Utility.convertCoordinate(y) - 1);
+                case "M", "SHIP", "X" -> board.markTileAsShip(x - 1, Utility.convertCoordinate(y) - 1);
+                case "U", "UNMARK"    -> board.unmarkTile(x - 1, Utility.convertCoordinate(y) - 1);
+                case "R", "REVEAL"    -> board.revealRandomTile();
             }
             isShorthandUsed = false;
             board.updateDuration();

@@ -201,29 +201,60 @@ public class PersistenceController {
     }
 
     public void saveGame(Player player, Board board) {
+        checkId(player);
+        removeUnfinishedGames(player);
+        if (board.getId() < 0) {
+            saveNewGame(player, board);
+        } else {
+            removeGame(board);
+            saveNewGame(player, board);
+        }
+    }
+
+    public void removeUnfinishedGames(Player player) {
+        checkId(player);
         try {
-            /* Saving the game session */
-            if (board.getId() >= 0) {
-                String deleteQuery = "DELETE FROM games WHERE game_id = ?";
-                PreparedStatement statement = connection.prepareStatement(deleteQuery);
-                statement.setInt(1, board.getId());
-                statement.executeUpdate();
-                statement.close();
-            }
-            String gameQuery = "INSERT INTO games (player_id, board_size, score, start, duration) VALUES (?, ?, ?, ?, ?);";
-            PreparedStatement statement = connection.prepareStatement(gameQuery);
+            String query = "DELETE FROM games WHERE player_id = ? AND \"end\" IS NULL;";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, player.getId());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            System.err.println("Could not remove unfinished games of player with id [" + player.getId() + "]!");
+        }
+    }
+
+    public void saveNewGame(Player player, Board board) {
+        checkId(player);
+        try {
+            // a special INSERT query which also returns a value, in this case the new ID it saved the game with
+            String query = "INSERT INTO games (player_id, board_size, score, start, duration) VALUES (?, ?, ?, ?, ?) RETURNING game_id;";
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, player.getId());
             statement.setInt(2, board.getBoardSize());
             statement.setInt(3, board.getScore());
             statement.setTimestamp(4, Timestamp.valueOf(board.getStartTime()));
-            statement.setObject(5, new PGInterval(0, 0, 0, 0, 0, board.getDuration().getSeconds()));
-            statement.executeUpdate();
+            statement.setObject(5, Utility.convert(board.getDuration()));
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) { // important!
+                board.setId(resultSet.getInt("game_id"));
+            } else {
+                throw new SQLException();
+            }
             statement.close();
-            /* Get the game back as it is in the database */
-            board.setId(fetchGame(player).getId());
+        } catch (SQLException e) {
+            System.err.println("Could not save game in the database!");
+        }
+        saveTiles(board);
+        saveShips(board);
+    }
+
+    private void saveTiles(Board board) {
+        checkId(board);
+        try {
             /* Saving the tiles of the board */
             String tilesQuery = "INSERT INTO tiles (game_id, x, y, is_ship, is_revealed) VALUES (?, ?, ?, ?, ?);";
-            statement = connection.prepareStatement(tilesQuery);
+            PreparedStatement statement = connection.prepareStatement(tilesQuery);
             for (PlayerTile[] row : board.getPlayerTiles()) {
                 for (PlayerTile tile : row) {
                     statement.setInt(1, board.getId());
@@ -238,10 +269,18 @@ public class PersistenceController {
                     statement.executeUpdate();
                 }
             }
-            /* Saves ships to the board, too */
+        } catch (SQLException e) {
+            System.err.println("Could not save tiles in the database!");
+            e.printStackTrace();
+        }
+    }
+
+    private void saveShips(Board board) {
+        checkId(board);
+        try {
             for (Ship ship : board.getShips()) {
                 String shipQuery = "INSERT INTO ships (ship_type_id) VALUES ((SELECT ship_type_id FROM ship_types WHERE length = ?)) RETURNING ship_id;";
-                statement = connection.prepareStatement(shipQuery);
+                PreparedStatement statement = connection.prepareStatement(shipQuery);
                 statement.setInt(1, ship.getSize());
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
@@ -257,8 +296,29 @@ public class PersistenceController {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Could not save game in the database!");
+            System.err.println("Could not save ships in the database!");
+        }
+    }
+
+    public void removeGame(Board board) {
+        checkId(board);
+        try {
+            String query = "DELETE FROM games WHERE game_id = ?;";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, board.getId());
+        } catch (SQLException e) {
+            System.err.println("Could not update game in the database!");
+        }
+    }
+
+    private void checkId(Object o) {
+        int id = switch (o) {
+            case Player p -> p.getId();
+            case Board b -> b.getId();
+            default -> throw new IllegalStateException("Unexpected value: " + o.getClass().getSimpleName());
+        };
+        if (id < 0) {
+            throw new IllegalArgumentException("ID cannot be negative!");
         }
     }
 
@@ -275,9 +335,12 @@ public class PersistenceController {
                 int score = resultSet.getInt("score");
                 LocalDateTime start = resultSet.getTimestamp("start").toLocalDateTime();
                 Duration duration = Duration.ofSeconds(resultSet.getInt("duration"));
+                List<PlayerTile> tiles = fetchTiles(gameId);
+                List<Ship> ships = fetchShips(gameId);
+                System.out.println(tiles + " :: " + ships);
                 return new Board(
                         gameId, boardSize, score,
-                        fetchTiles(gameId), fetchShips(gameId),
+                        tiles, ships,
                         start, duration
                 );
             }

@@ -44,9 +44,9 @@ public class Board {
         this.boardSize = boardSize;
         this.shipAmount = ships.size();
         this.score = score;
-        this.ships = ships;
         this.startTime = startTime;
         this.duration = duration;
+        this.ships = ships;
         generateTiles(playerTiles);
     }
 
@@ -186,7 +186,7 @@ public class Board {
         for (PlayerTile tile : playerTiles) {
             this.playerTiles[tile.getX() - 1][tile.getIntY() - 1] = tile;
             if (tile.getType() == Tile.Type.SHIP_PART) {
-                this.playerTiles[tile.getX() - 1][tile.getIntY() - 1].setCorrespondingShip(answerTiles[tile.getX() - 1][tile.getIntY() - 1].getCorrespondingShip());
+                this.answerTiles[tile.getX() - 1][tile.getIntY() - 1].getCorrespondingShip().decrementRemainingParts();
             }
         }
     }

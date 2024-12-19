@@ -1,5 +1,9 @@
 package be.kdg.integration1.battleships_solitaire.logic;
 
+import org.postgresql.util.PGInterval;
+
+import java.time.Duration;
+
 public final class Utility {
 
     public static char convertCoordinate(int n) {
@@ -8,6 +12,10 @@ public final class Utility {
 
     public static int convertCoordinate(char c) {
         return c - 'A' + 1;
+    }
+
+    public static PGInterval convert(Duration duration) {
+        return new PGInterval(0, 0, 0, 0, 0, duration.getSeconds());
     }
 
     public static boolean isXNotInBounds(int x, int limit) {
