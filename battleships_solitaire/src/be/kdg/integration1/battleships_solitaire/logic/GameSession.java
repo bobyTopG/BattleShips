@@ -32,9 +32,17 @@ public class GameSession {
         uiHandler = new TerminalUIHandler();
         persistenceController = new PersistenceController();
         isNewGame = uiHandler.startNewGame();
-        board = isNewGame ?
-                new Board(uiHandler.chooseDifficulty().getBoardSize()) :
-                persistenceController.fetchGame(player);
+        if (isNewGame) {
+            board = new Board(uiHandler.chooseDifficulty().getBoardSize());
+        } else {
+            Board fetchedGame = persistenceController.fetchGame(player);
+            if (fetchedGame == null) {
+                System.out.println("No game to load! Starting a new game.");
+                board = new Board(uiHandler.chooseDifficulty().getBoardSize());
+            } else {
+                board = fetchedGame;
+            }
+        }
     }
 
     public void startGame() {
@@ -81,7 +89,8 @@ public class GameSession {
                     }
                 }
                 case "S", "SAVE" -> {
-                    // TODO: save the game in the database
+                    board.updateDuration();
+                    persistenceController.saveGame(player, board);
                     continue;
                 }
                 case "E", "EXIT", "END" -> {
@@ -100,9 +109,8 @@ public class GameSession {
         }
         if (board.isGameOver()) {
             uiHandler.endOfGame();
-            board.setDuration(Duration.ZERO);
             System.out.println(board.answersToString());
-            // TODO: save the game in the database
+            persistenceController.saveGame(player, board);
         }
     }
 
@@ -135,14 +143,4 @@ public class GameSession {
 //        }
 //
 //    }
-//
-//    public String getElapsedTime() {
-//        if (startTime == 0) {
-//            return "Timer has not started.";
-//        }
-//        long elapsedTime = (endTime > 0 ? endTime : System.currentTimeMillis()) - startTime;
-//        return String.format("Final elapsed time: %.2f seconds", elapsedTime / 1000.0);
-//    }
-//
-//}
 }

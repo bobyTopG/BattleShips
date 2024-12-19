@@ -2,10 +2,14 @@ package be.kdg.integration1.battleships_solitaire.logic;
 
 import be.kdg.integration1.battleships_solitaire.entities.*;
 import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
+import org.postgresql.util.PGInterval;
 
 import java.sql.*;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The class {@code PersistenceController} deals with everything related to the database.
@@ -195,46 +199,147 @@ public class PersistenceController {
     public void saveGame(Player player, Board board) {
         try {
             /* Saving the game session */
+            if (board.getId() >= 0) {
+                String deleteQuery = "DELETE FROM games WHERE game_id = ?";
+                PreparedStatement statement = connection.prepareStatement(deleteQuery);
+                statement.setInt(1, board.getId());
+                statement.executeUpdate();
+                statement.close();
+            }
             String gameQuery = "INSERT INTO games (player_id, board_size, score, start, duration) VALUES (?, ?, ?, ?, ?);";
             PreparedStatement statement = connection.prepareStatement(gameQuery);
             statement.setInt(1, player.getId());
             statement.setInt(2, board.getBoardSize());
-            statement.setInt(3, 0); // TODO: score from the board?
-            statement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now())); // TODO: start from the board?
-            statement.setString(5, "5 min"); // TODO: duration from the board?
+            statement.setInt(3, board.getScore());
+            statement.setTimestamp(4, Timestamp.valueOf(board.getStartTime()));
+            statement.setObject(5, new PGInterval(0, 0, 0, 0, 0, board.getDuration().getSeconds()));
             statement.executeUpdate();
             statement.close();
             /* Get the game back as it is in the database */
-            // TODO: get the game from the db
+            board.setId(fetchGame(player).getId());
             /* Saving the tiles of the board */
-            String tilesQuery = "INSERT INTO tiles (game_id, x, y, is_ship) VALUES (?, ?, ?, ?);";
+            String tilesQuery = "INSERT INTO tiles (game_id, x, y, is_ship, is_revealed) VALUES (?, ?, ?, ?, ?);";
             statement = connection.prepareStatement(tilesQuery);
-            for (Tile[] row : board.getPlayerTiles()) {
-                for (Tile tile : row) {
+            for (PlayerTile[] row : board.getPlayerTiles()) {
+                for (PlayerTile tile : row) {
                     statement.setInt(1, board.getId());
                     statement.setInt(2, tile.getX());
                     statement.setString(3, String.valueOf(tile.getCharY()));
                     if (tile.isShip() || tile.isWater()) {
-                        statement.setBoolean(4, tile.isShip());
+                        statement.setObject(4, tile.isShip());
                     } else {
                         statement.setObject(4, null);
                     }
+                    statement.setBoolean(5, tile.isRevealed());
                     statement.executeUpdate();
                 }
             }
             /* Saves ships to the board, too */
-            // TODO: implement this last part, argh
+            for (Ship ship : board.getShips()) {
+                String shipQuery = "INSERT INTO ships (ship_type_id) VALUES ((SELECT ship_type_id FROM ship_types WHERE length = ?)) RETURNING ship_id;";
+                statement = connection.prepareStatement(shipQuery);
+                statement.setInt(1, ship.getSize());
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    String placementQuery = "INSERT INTO placements (game_id, ship_id, x, y, is_vertical) VALUES (?, ?, ?, ?, ?);";
+                    statement = connection.prepareStatement(placementQuery);
+                    statement.setInt(1, board.getId());
+                    statement.setInt(2, resultSet.getInt("ship_id"));
+                    statement.setInt(3, ship.getX());
+                    statement.setString(4, String.valueOf(ship.getCharY()));
+                    statement.setBoolean(5, ship.isVertical());
+                    statement.executeUpdate();
+                    statement.close();
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Could not save player in the database!");
+            System.err.println("Could not save game in the database!");
         }
-        // TODO:? we can try to separate the queries into different methods
     }
 
     public Board fetchGame(Player player) {
-        Board board = null;
-        /* TODO */
-        return board;
+        try {
+            // first getting the game itself
+            String gameQuery = "SELECT game_id, board_size, score, start, EXTRACT(EPOCH FROM duration) AS duration FROM games WHERE player_id = ?";
+            PreparedStatement statement = connection.prepareStatement(gameQuery);
+            statement.setInt(1, player.getId());
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int gameId = resultSet.getInt("game_id");
+                int boardSize = resultSet.getInt("board_size");
+                int score = resultSet.getInt("score");
+                LocalDateTime start = resultSet.getTimestamp("start").toLocalDateTime();
+                Duration duration = Duration.ofSeconds(resultSet.getInt("duration"));
+                return new Board(
+                        gameId, boardSize, score,
+                        fetchTiles(gameId), fetchShips(gameId),
+                        start, duration
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("Could not fetch game from the database!");
+        }
+        return null;
+    }
+
+    private List<PlayerTile> fetchTiles(int gameId) {
+        List<PlayerTile> tiles = new ArrayList<>();
+        try {
+            String tileQuery = "SELECT x, y, is_ship, is_revealed FROM tiles WHERE game_id = ?;";
+            PreparedStatement statement = connection.prepareStatement(tileQuery);
+            statement.setInt(1, gameId);
+            ResultSet resultSet = statement.executeQuery();
+
+            int x;
+            char y;
+            Tile.Type type;
+            Boolean isShip;
+            boolean revealed;
+
+            while (resultSet.next()) {
+                x = resultSet.getInt("x");
+                y = resultSet.getString("y").charAt(0);
+                revealed = resultSet.getBoolean("is_revealed");
+                isShip = resultSet.getObject("is_ship", Boolean.class);
+                type = isShip == null ? null : isShip ? Tile.Type.SHIP_PART : Tile.Type.WATER;
+                tiles.add(new PlayerTile(x, y, revealed, type));
+            }
+        } catch (SQLException e) {
+            System.err.println("Could not fetch tiles from the database!");
+            e.printStackTrace();
+        }
+        return tiles;
+    }
+
+    private List<Ship> fetchShips(int gameId) {
+        List<Ship> ships = new ArrayList<>();
+        try {
+            String tileQuery = "SELECT x, y, length, is_vertical " +
+                    "FROM placements p " +
+                    "JOIN ships s ON p.ship_id = s.ship_id " +
+                    "JOIN ship_types st ON s.ship_type_id = st.ship_type_id " +
+                    "WHERE game_id = ?";
+            PreparedStatement statement = connection.prepareStatement(tileQuery);
+            statement.setInt(1, gameId);
+            ResultSet resultSet = statement.executeQuery();
+
+            int x;
+            char y;
+            int size;
+            boolean isVertical;
+
+            while (resultSet.next()) {
+                x = resultSet.getInt("x");
+                y = resultSet.getString("y").charAt(0);
+                size = resultSet.getInt("length");
+                isVertical = resultSet.getBoolean("is_vertical");
+                ships.add(new Ship(x, y, size, isVertical));
+            }
+        } catch (SQLException e) {
+            System.err.println("Could not fetch ships from the database!");
+        }
+        return ships;
     }
 
     public int getGameCount() {

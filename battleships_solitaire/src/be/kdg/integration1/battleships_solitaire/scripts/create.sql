@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS games
     CHECK ( board_size IN (5, 7, 9) ),
     player_id  INTEGER
     CONSTRAINT nn_player_id NOT NULL
-    CONSTRAINT fk_player_id REFERENCES games (game_id)
+    CONSTRAINT fk_player_id REFERENCES players (player_id)
     ON DELETE SET NULL
     );
 
@@ -63,10 +63,12 @@ CREATE TABLE IF NOT EXISTS tiles
     CONSTRAINT nn_y NOT NULL
     CONSTRAINT ch_y CHECK ( y = UPPER(y) ),
     is_ship BOOLEAN,
+    is_revealed BOOLEAN
+    CONSTRAINT nn_is_revealed NOT NULL,
     game_id INTEGER
     CONSTRAINT nn_game_id NOT NULL
     CONSTRAINT fk_tile_game_id REFERENCES games (game_id)
-    ON DELETE SET NULL,
+    ON DELETE CASCADE,
     CONSTRAINT uq_tile UNIQUE (tile_id, x, y)
     );
 
@@ -100,11 +102,11 @@ CREATE TABLE IF NOT EXISTS placements
     game_id     INTEGER
     CONSTRAINT nn_placement_game_id NOT NULL
     CONSTRAINT fk_game_id REFERENCES games (game_id)
-    ON DELETE SET NULL,
+    ON DELETE CASCADE,
     ship_id     INTEGER
     CONSTRAINT nn_placement_ship_id NOT NULL
     CONSTRAINT fk_ship_id REFERENCES ships (ship_id)
-    ON DELETE SET NULL,
+    ON DELETE CASCADE,
     x           NUMERIC(2)
     CONSTRAINT nn_ship_x NOT NULL,
     y           CHAR(1)

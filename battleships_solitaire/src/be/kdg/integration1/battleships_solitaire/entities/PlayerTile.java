@@ -7,6 +7,12 @@ public class PlayerTile extends Tile {
         super(x, y);
     }
 
+    public PlayerTile(int x, char y, boolean isRevealed, Tile.Type type) {
+        super(x, y);
+        this.isRevealed = isRevealed;
+        this.type = type;
+    }
+
     public PlayerTile(int x, int y) {
         super(x, y);
     }

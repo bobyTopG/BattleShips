@@ -8,10 +8,11 @@ import java.util.*;
 
 public class Board {
 
-    private final int id;
+    private int id;
     private final int boardSize;
     private final int shipAmount;
     private int score;
+
     private PlayerTile[][] playerTiles;
     private Tile[][] answerTiles;
     private List<Ship> ships;
@@ -38,12 +39,23 @@ public class Board {
         score = Difficulty.valueOf(boardSize).getStartingPoints();
     }
 
-    public void generate() {
-        generateTiles();
-        generateShips();
+    public Board(int id, int boardSize, int score, List<PlayerTile> playerTiles, List<Ship> ships, LocalDateTime startTime, Duration duration) {
+        this.id = id;
+        this.boardSize = boardSize;
+        this.shipAmount = ships.size();
+        this.score = score;
+        this.ships = ships;
+        this.startTime = startTime;
+        this.duration = duration;
+        generateTiles(playerTiles);
     }
 
-    public void generateShips() {
+    public void generate() {
+        generateTiles();
+        generateRandomShips();
+    }
+
+    public void generateRandomShips() {
         Random random = new Random();
         this.ships = new ArrayList<>(shipAmount);
         List<Ship.Type> shipTypes = getShipTypes(Difficulty.valueOf(boardSize));
@@ -76,6 +88,12 @@ public class Board {
                 generate();
                 break;
             }
+        }
+    }
+
+    private void generateShipsFromList() {
+        for (Ship ship : ships) {
+            placeShip(generateTilesFromShip(ship));
         }
     }
 
@@ -157,6 +175,18 @@ public class Board {
                 playerTiles[i][j] = new PlayerTile(i + 1, j + 1);
                 answerTiles[i][j] = new Tile(i + 1, j + 1);
                 answerTiles[i][j].markAs(Tile.Type.WATER);
+            }
+        }
+    }
+
+    public void generateTiles(List<PlayerTile> playerTiles) {
+        // System.out.println("Generating Tiles...");
+        generateTiles();
+        generateShipsFromList();
+        for (PlayerTile tile : playerTiles) {
+            this.playerTiles[tile.getX() - 1][tile.getIntY() - 1] = tile;
+            if (tile.getType() == Tile.Type.SHIP_PART) {
+                this.playerTiles[tile.getX() - 1][tile.getIntY() - 1].setCorrespondingShip(answerTiles[tile.getX() - 1][tile.getIntY() - 1].getCorrespondingShip());
             }
         }
     }
@@ -277,11 +307,19 @@ public class Board {
         return boardSize;
     }
 
+    public int getScore() {
+        return score;
+    }
+
+    public List<Ship> getShips() {
+        return ships;
+    }
+
     public int getId() {
         return id;
     }
 
-    public Tile[][] getPlayerTiles() {
+    public PlayerTile[][] getPlayerTiles() {
         return playerTiles;
     }
 
@@ -303,6 +341,10 @@ public class Board {
 
     public Duration getDuration() {
         return duration;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setDuration(Duration duration) {
