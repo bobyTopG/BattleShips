@@ -2,7 +2,6 @@ package be.kdg.integration1.battleships_solitaire.logic;
 
 import be.kdg.integration1.battleships_solitaire.entities.*;
 import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
-import org.postgresql.util.PGInterval;
 
 import java.sql.*;
 import java.time.Duration;
@@ -98,7 +97,8 @@ public class PersistenceController {
                     """);
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS ship_types (
-                          ship_type_id NUMERIC(1)
+                          ship_type_id INTEGER
+                              GENERATED ALWAYS AS IDENTITY
                               CONSTRAINT pk_ship_type_id PRIMARY KEY,
                           length NUMERIC(1)
                               CONSTRAINT nn_length NOT NULL,
@@ -139,12 +139,11 @@ public class PersistenceController {
 
     public void insertShipTypes(){
         try {
-            String query = "INSERT INTO ship_types (ship_type_id, length, name) VALUES (?, ?, ?) ON CONFLICT DO NOTHING";
+            String query = "INSERT INTO ship_types (length, name) VALUES (?, ?) ON CONFLICT (length, name) DO NOTHING";
             for (Ship.Type shipType : Ship.Type.values() ) {
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setInt(1, shipType.getSize());
-                statement.setInt(2, shipType.getSize());
-                statement.setString(3, shipType.name());
+                statement.setString(2, shipType.name());
                 statement.executeUpdate();
                 statement.close();
             }
@@ -153,7 +152,6 @@ public class PersistenceController {
             System.err.println("Ship Types could not be added to the database!");
         }
     }
-
 
     public void savePlayer(Player player) {
         try {
@@ -247,13 +245,14 @@ public class PersistenceController {
         checkId(player);
         try {
             // a special INSERT query which also returns a value, in this case the new ID it saved the game with
-            String query = "INSERT INTO games (player_id, board_size, score, start, duration) VALUES (?, ?, ?, ?, ?) RETURNING game_id;";
+            String query = "INSERT INTO games (player_id, board_size, score, start, \"end\", duration) VALUES (?, ?, ?, ?, ?, ?) RETURNING game_id;";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, player.getId());
             statement.setInt(2, board.getBoardSize());
             statement.setInt(3, board.getScore());
             statement.setTimestamp(4, Timestamp.valueOf(board.getStartTime()));
-            statement.setObject(5, Utility.convert(board.getDuration()));
+            statement.setTimestamp(5, board.getEndTime() == null ? null : Timestamp.valueOf(board.getEndTime()));
+            statement.setObject(6, Utility.convert(board.getDuration()));
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) { // important!
                 board.setId(resultSet.getInt("game_id"));
@@ -303,10 +302,11 @@ public class PersistenceController {
                 statement.setInt(1, ship.getSize());
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
+                    ship.setId(resultSet.getInt("ship_id"));
                     String placementQuery = "INSERT INTO placements (game_id, ship_id, x, y, is_vertical) VALUES (?, ?, ?, ?, ?);";
                     statement = connection.prepareStatement(placementQuery);
                     statement.setInt(1, board.getId());
-                    statement.setInt(2, resultSet.getInt("ship_id"));
+                    statement.setInt(2, ship.getId());
                     statement.setInt(3, ship.getX());
                     statement.setString(4, String.valueOf(ship.getCharY()));
                     statement.setBoolean(5, ship.isVertical());
@@ -315,6 +315,7 @@ public class PersistenceController {
                 }
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             System.err.println("Could not save ships in the database!");
         }
     }
@@ -328,18 +329,19 @@ public class PersistenceController {
             statement.executeUpdate();
             statement.close();
 
-//            List<Integer> shipIds = new ArrayList<>();
-//
-//            for (Ship ship : board.getShips() ) {
-//                shipIds.add(ship.get) //TODO no access to id of ships
-//            }
-//            String query2 = "DELETE FROM ships WHERE game_id = ANY (?) ;";
-//            statement = connection.prepareStatement(query2);
-//            Array shipIdsArray = statement.getConnection().createArrayOf("NUMERIC", shipIds.toArray());
-//
-//            statement.setArray(1, shipIdsArray);
-//            statement.executeUpdate();
-//            statement.close();
+            /* Removing the ships (no possible cascade*, triggers* possible) */
+            List<Integer> shipIds = new ArrayList<>();
+            for (Ship ship : board.getShips() ) {
+                shipIds.add(ship.getId());
+            }
+
+            String shipsQuery = "DELETE FROM ships WHERE ship_id = ANY (?);";
+            statement = connection.prepareStatement(shipsQuery);
+
+            Array shipIdsArray = statement.getConnection().createArrayOf("NUMERIC", shipIds.toArray());
+            statement.setArray(1, shipIdsArray);
+            statement.executeUpdate();
+            statement.close();
 
         } catch (SQLException e) {
             System.err.println("Could not update game in the database!");
@@ -360,7 +362,7 @@ public class PersistenceController {
     public Board fetchGame(Player player) {
         try {
             // first getting the game itself
-            String gameQuery = "SELECT game_id, board_size, score, start, EXTRACT(EPOCH FROM duration) AS duration FROM games WHERE player_id = ?";
+            String gameQuery = "SELECT game_id, board_size, score, start, EXTRACT(EPOCH FROM duration) AS duration FROM games WHERE player_id = ? AND \"end\" IS NULL;";
             PreparedStatement statement = connection.prepareStatement(gameQuery);
             statement.setInt(1, player.getId());
             ResultSet resultSet = statement.executeQuery();
@@ -372,7 +374,6 @@ public class PersistenceController {
                 Duration duration = Duration.ofSeconds(resultSet.getInt("duration"));
                 List<PlayerTile> tiles = fetchTiles(gameId);
                 List<Ship> ships = fetchShips(gameId);
-                System.out.println(tiles + " :: " + ships);
                 return new Board(
                         gameId, boardSize, score,
                         tiles, ships,

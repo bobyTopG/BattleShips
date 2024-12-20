@@ -38,7 +38,7 @@ public class GameSession {
             if (fetchedGame == null) {
                 System.out.println("No game to load! Starting a new game.");
                 board = new Board(uiHandler.chooseDifficulty().getBoardSize());
-                isNewGame = true;
+                // isNewGame = true;
             } else {
                 board = fetchedGame;
             }
@@ -110,6 +110,7 @@ public class GameSession {
         if (board.isGameOver()) {
             uiHandler.endOfGame();
             System.out.println(board.answersToString());
+            board.setEndTime(LocalDateTime.now());
             persistenceController.saveGame(player, board);
         }
     }

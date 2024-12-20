@@ -81,7 +81,8 @@ CREATE TABLE IF NOT EXISTS ship_types
     length       NUMERIC(1)
     CONSTRAINT nn_length NOT NULL,
     name         VARCHAR(12)
-    CONSTRAINT nn_ship_name NOT NULL
+    CONSTRAINT nn_ship_name NOT NULL,
+    CONSTRAINT uq_ship UNIQUE (length, name)
     );
 
 /* Creating the SHIPS table */
@@ -106,7 +107,7 @@ CREATE TABLE IF NOT EXISTS placements
     ship_id     INTEGER
     CONSTRAINT nn_placement_ship_id NOT NULL
     CONSTRAINT fk_ship_id REFERENCES ships (ship_id)
-    ON DELETE CASCADE,
+    ON DELETE SET NULL,
     x           NUMERIC(2)
     CONSTRAINT nn_ship_x NOT NULL,
     y           CHAR(1)

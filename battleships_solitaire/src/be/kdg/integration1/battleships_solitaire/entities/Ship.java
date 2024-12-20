@@ -33,6 +33,8 @@ public class Ship implements Comparable<Ship> {
         }
     }
 
+    private int id;
+
     private final int x;
     private final char y;
     private final Type type;
@@ -58,6 +60,14 @@ public class Ship implements Comparable<Ship> {
 
     public Ship(int x, int y, int size, boolean isVertical) {
         this(x, y, Type.getFromSize(size), isVertical);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getX() {

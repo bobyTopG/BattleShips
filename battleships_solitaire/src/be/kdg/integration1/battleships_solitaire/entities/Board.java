@@ -218,7 +218,8 @@ public class Board {
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
                 if (playerTiles[x][y].getType() == Tile.Type.SHIP_PART
-                        && playerTiles[x][y].getCorrespondingShip() == null) {
+                        && answerTiles[x][y].getCorrespondingShip() == null) {
+                    System.out.println(playerTiles[x][y].getType() + " : " + playerTiles[x][y].getCorrespondingShip());
                     return false;
                 }
             }
