@@ -24,7 +24,7 @@ public class GameSession {
 
     private String shorthandCommand;
     private boolean isShorthandUsed;
-    private final boolean isNewGame;
+    private boolean isNewGame;
 
     public GameSession(Player player) {
         this.player = player;
@@ -38,6 +38,7 @@ public class GameSession {
             if (fetchedGame == null) {
                 System.out.println("No game to load! Starting a new game.");
                 board = new Board(uiHandler.chooseDifficulty().getBoardSize());
+                isNewGame = true;
             } else {
                 board = fetchedGame;
             }

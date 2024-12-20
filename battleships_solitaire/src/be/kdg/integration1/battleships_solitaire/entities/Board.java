@@ -20,7 +20,7 @@ public class Board {
     private LocalDateTime currentTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private Duration duration;
+    private Duration duration = Duration.ZERO;
 
     public Board(int boardSize) {
         this(-1, boardSize);

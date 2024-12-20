@@ -29,6 +29,7 @@ public class PersistenceController {
         try {
             connection = DriverManager.getConnection(URL + TABLE, USERNAME, PASSWORD);
             createTables();
+            insertShipTypes();
             // System.out.println("There are " + getGameCount() + " saved game(s) in the database");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -74,8 +75,7 @@ public class PersistenceController {
                          CHECK ( board_size IN (5, 7, 9) ),
                          player_id  INTEGER
                          CONSTRAINT nn_player_id NOT NULL
-                         CONSTRAINT fk_player_id REFERENCES players (player_id)
-                         ON DELETE SET NULL)
+                         CONSTRAINT fk_player_id REFERENCES players (player_id))
                     """);
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS tiles (
@@ -98,8 +98,7 @@ public class PersistenceController {
                     """);
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS ship_types (
-                          ship_type_id INTEGER
-                              GENERATED ALWAYS AS IDENTITY
+                          ship_type_id NUMERIC(1)
                               CONSTRAINT pk_ship_type_id PRIMARY KEY,
                           length NUMERIC(1)
                               CONSTRAINT nn_length NOT NULL,
@@ -120,21 +119,41 @@ public class PersistenceController {
                     CREATE TABLE IF NOT EXISTS placements (
                         game_id INTEGER
                             CONSTRAINT nn_placement_game_id NOT NULL
-                            CONSTRAINT fk_game_id REFERENCES games(game_id),
+                            CONSTRAINT fk_game_id REFERENCES games(game_id)
+                                 ON DELETE CASCADE,
                         ship_id INTEGER
                             CONSTRAINT nn_placement_ship_id NOT NULL
                             CONSTRAINT fk_ship_id REFERENCES ships(ship_id),
                         x NUMERIC(2)
                             CONSTRAINT nn_ship_x NOT NULL,
-                        y NUMERIC(2)
+                        y CHAR(1)
                             CONSTRAINT nn_ship_y NOT NULL,
                         is_vertical BOOLEAN,
                         CONSTRAINT pk_placements PRIMARY KEY (game_id, ship_id))
+                    
                     """);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+    public void insertShipTypes(){
+        try {
+            String query = "INSERT INTO ship_types (ship_type_id, length, name) VALUES (?, ?, ?) ON CONFLICT DO NOTHING";
+            for (Ship.Type shipType : Ship.Type.values() ) {
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, shipType.getSize());
+                statement.setInt(2, shipType.getSize());
+                statement.setString(3, shipType.name());
+                statement.executeUpdate();
+                statement.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Ship Types could not be added to the database!");
+        }
+    }
+
 
     public void savePlayer(Player player) {
         try {
@@ -303,9 +322,25 @@ public class PersistenceController {
     public void removeGame(Board board) {
         checkId(board);
         try {
-            String query = "DELETE FROM games WHERE game_id = ?;";
+            String query = "DELETE FROM games WHERE game_id = ? ;";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, board.getId());
+            statement.executeUpdate();
+            statement.close();
+
+//            List<Integer> shipIds = new ArrayList<>();
+//
+//            for (Ship ship : board.getShips() ) {
+//                shipIds.add(ship.get) //TODO no access to id of ships
+//            }
+//            String query2 = "DELETE FROM ships WHERE game_id = ANY (?) ;";
+//            statement = connection.prepareStatement(query2);
+//            Array shipIdsArray = statement.getConnection().createArrayOf("NUMERIC", shipIds.toArray());
+//
+//            statement.setArray(1, shipIdsArray);
+//            statement.executeUpdate();
+//            statement.close();
+
         } catch (SQLException e) {
             System.err.println("Could not update game in the database!");
         }
