@@ -22,6 +22,7 @@ public interface UIHandler {
     void showMainMenu();
     void showPlayingOptions();
     void showHelpScreen();
+    void showLeaderboard();
     void welcomePlayer(Player player);
     void awaitEnter();
     int chooseX(int limit);

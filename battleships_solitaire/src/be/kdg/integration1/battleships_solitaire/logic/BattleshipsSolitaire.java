@@ -48,7 +48,7 @@ public class BattleshipsSolitaire {
                 uiHandler.awaitEnter();
             }
             case "L", "LEADERBOARD", "3" -> {
-                // uiHandler.showLeaderboard(persistenceController.fetchLeaderboard());
+                uiHandler.showLeaderboard();
                 uiHandler.awaitEnter();
             }
             case "E", "EXIT", "Q", "QUIT", "4" -> {

@@ -1,7 +1,9 @@
 package be.kdg.integration1.battleships_solitaire.view;
 
 import be.kdg.integration1.battleships_solitaire.entities.Difficulty;
+import be.kdg.integration1.battleships_solitaire.entities.Leaderboard;
 import be.kdg.integration1.battleships_solitaire.entities.Player;
+import be.kdg.integration1.battleships_solitaire.logic.PersistenceController;
 import be.kdg.integration1.battleships_solitaire.logic.Utility;
 
 import java.time.LocalDate;
@@ -14,9 +16,11 @@ public class TerminalUIHandler implements UIHandler {
     private final Scanner scanner;
     private String response;
     private final int NAME_MAX_CHARACTERS = 12;
+    private final PersistenceController persistenceController;
 
     public TerminalUIHandler() {
         this.scanner = new Scanner(System.in);
+        this.persistenceController = new PersistenceController();
     }
 
     @Override
@@ -193,16 +197,30 @@ public class TerminalUIHandler implements UIHandler {
     public void showHelpScreen() {
         System.out.println("""
                 
-                How to play the game? - The game is simple. You have to guess where the ships are starting with a handful of revealed tiles (hints). Each tile is either water or a ship part. Per column and row you will find how many ship pieces are found. Underneath the board you will find a list of the ships and the progress of revealing them. Above the board you will see your score and time passed since the game started.
+                How to play the game? - The game is simple! You have to guess the location of all ships, starting with a handful of revealed tiles (hints).
+                Each tile is either water or (part of) a ship. Per column and row, you can see how many ship pieces you've already found.
+                Underneath the board, you will find a list of the ships and the progress of revealing them.
+                Above the board, you will see your score and time passed since the game started.
                 
-                How to use the controls? - The game is made to be as intuitive as possible so just follow the menus. When you have made a choice just type in the corresponding letter and press ENTER.
+                How to use the controls? - The game is made to be as intuitive as possible, so just follow the menus.
+                When you have made a choice, just type in the corresponding letter and press ENTER.
                 
-                What is what on the board? - The letters correspond to a column meanwhile the numbers on the left correspond to a row. Squares are ship pieces that are revealed to you by the game, same goes for the double squiggly line. The singular squiggly line represents water, while an X represents where you have marked a tile as a ship piece.
+                What is what on the board? - The letters correspond to a column, meanwhile the numbers on the left correspond to a row.
+                Squares are ship pieces that are revealed to you by the game, same goes for the double squiggly line.
+                The singular squiggly line (~) represents water, while an X represents where you have marked a tile as a ship piece.
                 
                 If you have any more questions about the game, just contact its authors.
                 And don't forget to have fun!
                 """);
     }
+
+    @Override
+    public void showLeaderboard() {
+        Leaderboard leaderboard = persistenceController.loadLeaderBoard();
+        System.out.println(leaderboard);
+    }
+
+
 
     @Override
     public void welcomePlayer(Player player) {
