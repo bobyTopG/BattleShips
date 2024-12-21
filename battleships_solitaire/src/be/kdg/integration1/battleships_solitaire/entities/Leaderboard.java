@@ -52,48 +52,13 @@ public class Leaderboard {
         leaderboardRows.add(leaderBoardRow);
     }
 
+    public List<LeaderboardRow> getLeaderboardRows() {
+        return leaderboardRows;
+    }
+
     public Leaderboard() {
         leaderboardRows = new ArrayList<>();
     }
-//
-//
-//    // Add player to the leaderboard
-//    public void addPlayer(Player player) {
-//        players.add(player);
-//    }
-//
-//    // Sort players based on their scores in descending order
-//    public void sortPlayersByScore() {
-//        Collections.sort(players, new Comparator<Player>() {
-//            @Override
-//            public int compare(Player p1, Player p2) {
-//                return 0; //Integer.compare(p2.getScore(), p1.getScore());  // Higher score first
-//            }
-//        });
-//    }
-//
-//    // Display the leaderboard
-//    public void displayLeaderboard() {
-//        sortPlayersByScore();  // Sort players before displaying
-//        System.out.println("Leaderboard:");
-//        for (int i = 0; i < players.size(); i++) {
-//            Player player = players.get(i);
-////            System.out.println((i + 1) + ". " + player.getName() + " - Score: " + player.getScore());
-//        }
-//    }
-//
-//    // Get the top player (highest score)
-//    public Player getTopPlayer() {
-//        if (players.isEmpty()) {
-//            return null;
-//        }
-//        sortPlayersByScore();
-//        return players.get(0);  // Return the player with the highest score
-//    }
-//
-//    public ArrayList<Player> getPlayers() {
-//        return players;
-//    }
 
     @Override
     public String toString() {
@@ -107,7 +72,7 @@ public class Leaderboard {
 
         // add each row of the leaderboard to output
         for (LeaderboardRow leaderBoardrow : leaderboardRows) {
-            DateFormat formatter = new SimpleDateFormat("dd-MM-YYYY");
+            DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
             String date = formatter.format(leaderBoardrow.getGameDate());
             leaderBoardrow.setRank(currentRank);
 
@@ -120,7 +85,7 @@ public class Leaderboard {
 
             currentRank++;
         }
-        sb.append("└──────┴──────────────┴────────────┴────────────┴───────────┘\n");
+        sb.append("└──────┴──────────────┴────────────┴────────────┴───────────┘");
 
         return sb.toString();
     }

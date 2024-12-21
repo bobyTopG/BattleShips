@@ -23,6 +23,7 @@ public class PersistenceController {
     public final String PASSWORD = "Student_1234";
 
     private Connection connection;
+    private Leaderboard leaderboard = new Leaderboard();
 
     public PersistenceController() {
         try {
@@ -458,34 +459,9 @@ public class PersistenceController {
         return gameCount;
     }
 
-    public Leaderboard loadLeaderBoard() {
-        Leaderboard leaderboard = new Leaderboard();
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT p.name, g.end, g.duration, g.score FROM games g " +
-                                                         "JOIN players p ON p.player_id = g.player_id ORDER BY g.score DESC FETCH FIRST 5 ROWS ONLY");
-            while (resultSet.next()) {
-                String playerName = resultSet.getString(1);
-                Date gameDate = resultSet.getDate(2);
-                String duration = resultSet.getString(3);
-                int score = resultSet.getInt(4);
-                // creates a new row in the leaderboard
-                Leaderboard.LeaderboardRow row = leaderboard.new LeaderboardRow(playerName, gameDate, duration, score);
-                // adds new row to the leaderboard, which can then be printed
-                leaderboard.addLeaderboardRow(row);
-            }
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Leaderboard could not be loaded!");
-
-        }
-        return leaderboard;
-    }
-
     // give resultset for fetch methods of the leaderboard
     public void fetchFromLeaderBoard(PreparedStatement statement) {
+        this.leaderboard = new Leaderboard();
         try {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -493,6 +469,10 @@ public class PersistenceController {
                 Date gameDate = resultSet.getDate(2);
                 String duration = resultSet.getString(3);
                 int score = resultSet.getInt(4);
+                // creates a new row in the leaderboard
+                Leaderboard.LeaderboardRow row = this.leaderboard.new LeaderboardRow(playerName, gameDate, duration, score);
+                // adds new row to the leaderboard, which can then be printed
+                this.leaderboard.addLeaderboardRow(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -500,9 +480,26 @@ public class PersistenceController {
         }
     }
 
+    public Leaderboard loadLeaderBoard(int amount) {
+//        Leaderboard leaderboard = new Leaderboard();
+        String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+                       "JOIN players p ON p.player_id = g.player_id ORDER BY g.score DESC FETCH FIRST ? ROWS ONLY";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, amount);
+            fetchFromLeaderBoard(statement);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Leaderboard could not be loaded!");
+
+        }
+        return this.leaderboard;
+    }
+
     //get leaderboard per person
-    public Leaderboard fetchLeaderBoardByName(String name) {
-        Leaderboard leaderboard = new Leaderboard();
+    public Leaderboard fetchLeaderboardPlayer(String name){
+        this.leaderboard = new Leaderboard();
         try {
             name = name.toUpperCase();
             String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
@@ -516,12 +513,12 @@ public class PersistenceController {
             e.printStackTrace();
             System.err.println("Player scores could not be retrieved!");
         }
-        return leaderboard;
+        return this.leaderboard;
     }
 
     //get leaderboard for difficulties based on boardSize
-    public Leaderboard fetchLeaderBoardByDifficulty(int boardSize) {
-        Leaderboard leaderboard = new Leaderboard();
+    public Leaderboard fetchLeaderboardDifficulty(int boardSize) {
+        this.leaderboard = new Leaderboard();
         try {
             String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
                            "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? " +
@@ -533,27 +530,9 @@ public class PersistenceController {
             e.printStackTrace();
             System.err.println("Leaderboard of difficulty could not be retrieved!");
         }
-        return leaderboard;
+        return this.leaderboard;
     }
 
-    //TODO error handling
-    //get leaderboard for difficulties based on name
-    public Leaderboard fetchLeaderBoardByDifficulty(String difficultyName) {
-        Leaderboard leaderboard = new Leaderboard();
-        try {
-            int boardSize = Difficulty.valueOf(difficultyName.toUpperCase()).getBoardSize();
-            String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
-                           "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? " +
-                           "ORDER BY g.score FETCH FIRST 5 ROWS ONLY";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, boardSize);
-            fetchFromLeaderBoard(statement);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Leaderboard of difficulty could not be retrieved!");
-        }
-        return leaderboard;
-    }
 
 
 }

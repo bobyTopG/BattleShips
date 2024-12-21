@@ -23,6 +23,10 @@ public interface UIHandler {
     void showPlayingOptions();
     void showHelpScreen();
     void showLeaderboard();
+    void showLeaderboard(int amount);
+    void showLeaderboardType(String name);
+    void showLeaderboardType(int boardSize);
+    void leaderboardChoice();
     void welcomePlayer(Player player);
     void awaitEnter();
     int chooseX(int limit);

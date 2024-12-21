@@ -9,6 +9,7 @@ import be.kdg.integration1.battleships_solitaire.logic.Utility;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class TerminalUIHandler implements UIHandler {
@@ -72,36 +73,36 @@ public class TerminalUIHandler implements UIHandler {
         switch (response) {
             case "P", "PLAY" -> {
                 System.out.println("""
-                ┌───────────────────────────────────────┐
-                │          ┌─────────────────┐          │
-                │        > │     Play [P]    │ <        │
-                │          └─────────────────┘          │
-                └───────────────────────────────────────┘""");
+                        ┌───────────────────────────────────────┐
+                        │          ┌─────────────────┐          │
+                        │        > │     Play [P]    │ <        │
+                        │          └─────────────────┘          │
+                        └───────────────────────────────────────┘""");
             }
             case "H", "HELP" -> {
                 System.out.println("""
-                ┌───────────────────────────────────────┐
-                │          ┌─────────────────┐          │
-                │        > │     Help [H]    │ <        │
-                │          └─────────────────┘          │
-                └───────────────────────────────────────┘""");
+                        ┌───────────────────────────────────────┐
+                        │          ┌─────────────────┐          │
+                        │        > │     Help [H]    │ <        │
+                        │          └─────────────────┘          │
+                        └───────────────────────────────────────┘""");
             }
             case "L", "LEADERBOARD" -> {
                 System.out.println("""
-                ┌───────────────────────────────────────┐
-                │          ┌─────────────────┐          │
-                │        > │ Leaderboard [L] │ <        │
-                │          └─────────────────┘          │
-                └───────────────────────────────────────┘""");
+                        ┌───────────────────────────────────────┐
+                        │          ┌─────────────────┐          │
+                        │        > │ Leaderboard [L] │ <        │
+                        │          └─────────────────┘          │
+                        └───────────────────────────────────────┘""");
             }
             case "E", "EXIT", "Q", "QUIT" -> {
                 System.out.println("""
-                ┌───────────────────────────────────────┐
-                │          ┌─────────────────┐          │
-                │        > │  Exit/Quit [E]  │ <        │
-                │          └─────────────────┘          │
-                └───────────────────────────────────────┘
-                Game quit!""");
+                        ┌───────────────────────────────────────┐
+                        │          ┌─────────────────┐          │
+                        │        > │  Exit/Quit [E]  │ <        │
+                        │          └─────────────────┘          │
+                        └───────────────────────────────────────┘
+                        Game quit!""");
             }
         }
     }
@@ -124,7 +125,7 @@ public class TerminalUIHandler implements UIHandler {
                 System.out.println("Name can't be empty. Please try again!");
             } else if (!name.matches("[a-zA-Z]+")) {
                 System.out.println("Your name may only contain letters. Please try again!");
-            } else if (name.length() > NAME_MAX_CHARACTERS){
+            } else if (name.length() > NAME_MAX_CHARACTERS) {
                 System.out.println("Your name cannot be longer than 12 characters. Please try again!");
             }
         } while (name.isEmpty() || !name.matches("[a-zA-Z]+") || name.length() > NAME_MAX_CHARACTERS);
@@ -189,7 +190,7 @@ public class TerminalUIHandler implements UIHandler {
             } catch (Exception e) {
                 System.out.println("Birthdate cannot be in the future!");
             }
-        }  while (birthdate.isAfter(LocalDate.now()));
+        } while (birthdate.isAfter(LocalDate.now()));
         return birthdate;
     }
 
@@ -216,10 +217,121 @@ public class TerminalUIHandler implements UIHandler {
 
     @Override
     public void showLeaderboard() {
-        Leaderboard leaderboard = persistenceController.loadLeaderBoard();
+        Leaderboard leaderboard = persistenceController.loadLeaderBoard(5);
         System.out.println(leaderboard);
+        leaderboardChoice();
     }
 
+    @Override
+    public void showLeaderboard(int amount) {
+        Leaderboard leaderboard = persistenceController.loadLeaderBoard(amount);
+        System.out.println(leaderboard);
+        leaderboardChoice();
+    }
+
+    @Override
+    public void leaderboardChoice() {
+        final int MAXIMUM_AMOUNT_ROWS = 25;
+
+        System.out.println("Select how you want to filter the leaderboard:");
+        prompt("by [T]OP SCORES - by [P]LAYER - by [D]IFFICULTY | [E]xit");
+        switch (response) {
+            case "T", "TOP", "1" -> {
+                int ranks = 1;
+                do {
+                    try {
+                        prompt("How many ranks do you want to see?");
+                        ranks = Integer.parseInt(response);
+                        if (ranks <= 0 || response.isEmpty()) {
+                            System.out.println("Please enter a number higher than 0!");
+                        } else if (ranks > MAXIMUM_AMOUNT_ROWS){
+                            System.out.println("You may only select the top 25 scores!");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input! Please enter a number.");
+                    }
+                } while (ranks <= 0 || ranks > 25);
+                showLeaderboard(ranks);
+            }
+
+            case "P", "PLAYER", "2" -> {
+                String name = "";
+                do {
+                    try {
+                        prompt("Which player do you want to see the scores of?");
+                        if (response.isEmpty()) {
+                            System.out.println("Please enter a name!");
+                        }
+                        name = response;
+                    } catch (NoSuchElementException e) {
+                        System.out.println("No input was detected! Please try again.");
+                        leaderboardChoice();
+                    }
+                } while (response.isEmpty());
+                showLeaderboardType(name);
+
+            }
+            case "D", "DIFFICULTY", "3" -> {
+                int boardSize = 0;
+                do {
+                    try {
+                        System.out.println("Available Difficulties: [E]ASY (5x5) | [M]EDIUM (7x7) | [H]ARD (9x9)");
+                        prompt("Which difficulty do you want to see the scores of?");
+                        if (response.isEmpty()) {
+                            System.out.println("Please enter a difficulty!");
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } while (response.isEmpty());
+                switch (response) {
+                    case "EASY", "E", "5", "5x5" -> {
+                        boardSize = Difficulty.EASY.getBoardSize();
+                    }
+                    case "MEDIUM", "M", "7", "7x7" -> {
+                        boardSize = Difficulty.MEDIUM.getBoardSize();
+                    }
+                    case "HARD", "H", "9", "9x9" -> {
+                        boardSize = Difficulty.HARD.getBoardSize();
+                    }
+                }
+                showLeaderboardType(boardSize);
+
+            }
+            case "E", "EXIT", "END" -> {
+            }
+
+            default -> {
+                System.out.println("Please select a valid option!");
+                leaderboardChoice();
+            }
+
+        }
+
+    }
+
+    @Override
+    public void showLeaderboardType(String name) {
+        Leaderboard leaderboard = persistenceController.fetchLeaderboardPlayer(name);
+        if (leaderboard.getLeaderboardRows().isEmpty()) {
+            System.out.println("No game data available for player " + name);
+        } else {
+            System.out.println(leaderboard);
+        }
+        leaderboardChoice();
+    }
+
+
+    @Override
+    public void showLeaderboardType(int boardSize) {
+        Leaderboard leaderboard = persistenceController.fetchLeaderboardDifficulty(boardSize);
+        if (leaderboard.getLeaderboardRows().isEmpty()) {
+            System.out.println("No game data available for difficulty \"" + Difficulty.valueOf(boardSize).getName() + "\"...\n");
+        } else {
+            System.out.println(leaderboard);
+        }
+        leaderboardChoice();
+    }
 
 
     @Override
