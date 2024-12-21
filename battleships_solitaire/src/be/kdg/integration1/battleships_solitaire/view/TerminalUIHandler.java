@@ -105,7 +105,7 @@ public class TerminalUIHandler implements UIHandler {
     @Override
     public void showPlayingOptions() {
         System.out.println("Mark [W]ater | [M]ark Ship | [U]nmark tile | [R]eveal tile | [S]ave game | [E]xit game");
-        prompt("Your move ");
+        prompt("Your move");
     }
 
     @Override
@@ -246,6 +246,17 @@ public class TerminalUIHandler implements UIHandler {
     @Override
     public void endOfGame() {
         System.out.println("Game finished!");
+    }
+
+    @Override
+    public boolean isUserSureToExit() {
+        prompt("Are you sure you want to exit? [Y/N]");
+        if (response.equals("Y")) {
+            return true;
+        } else {
+            System.out.println("Did not exit the game!");
+            return false;
+        }
     }
 
 }

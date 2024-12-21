@@ -25,6 +25,7 @@ public class GameSession {
     private String shorthandCommand;
     private boolean isShorthandUsed;
     private boolean isNewGame;
+    private boolean isJustSaved;
 
     public GameSession(Player player) {
         this.player = player;
@@ -38,7 +39,7 @@ public class GameSession {
             if (fetchedGame == null) {
                 System.out.println("No game to load! Starting a new game.");
                 board = new Board(uiHandler.chooseDifficulty().getBoardSize());
-                // isNewGame = true;
+                isNewGame = true;
             } else {
                 board = fetchedGame;
             }
@@ -91,10 +92,15 @@ public class GameSession {
                 case "S", "SAVE" -> {
                     board.updateDuration();
                     persistenceController.saveGame(player, board);
+                    isJustSaved = true;
                     continue;
                 }
                 case "E", "EXIT", "END" -> {
-                    break loop;
+                    if (isJustSaved) {
+                        break loop;
+                    } else if (uiHandler.isUserSureToExit()) {
+                        break loop;
+                    }
                 }
             }
 
@@ -104,7 +110,9 @@ public class GameSession {
                 case "U", "UNMARK"    -> board.unmarkTile(x - 1, Utility.convertCoordinate(y) - 1);
                 case "R", "REVEAL"    -> board.revealRandomTile();
             }
+
             isShorthandUsed = false;
+            isJustSaved = false;
             board.updateDuration();
         }
         if (board.isGameOver()) {

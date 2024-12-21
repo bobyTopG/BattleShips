@@ -27,4 +27,5 @@ public interface UIHandler {
     int chooseX(int limit);
     char chooseY(int limit);
     void endOfGame();
+    boolean isUserSureToExit();
 }
