@@ -11,12 +11,14 @@ public class Leaderboard {
         private String playerName;
         private Date gameDate;
         private String duration;
+        private Difficulty difficulty;
         private int score;
 
-        public LeaderboardRow(String playerName, Date gameDate, String duration, int score) {
+        public LeaderboardRow(String playerName, Date gameDate, String duration, Difficulty difficulty, int score) {
             this.playerName = playerName;
             this.gameDate = gameDate;
             this.duration = duration;
+            this.difficulty = difficulty;
             this.score = score;
         }
 
@@ -34,6 +36,10 @@ public class Leaderboard {
 
         public int getScore() {
             return score;
+        }
+
+        public Difficulty getDifficulty() {
+            return difficulty;
         }
 
         public int getRank() {
@@ -76,11 +82,12 @@ public class Leaderboard {
             String date = formatter.format(leaderBoardrow.getGameDate());
             leaderBoardrow.setRank(currentRank);
 
-            sb.append(String.format("│  %-3d │ %-12s │ %-10s │ %-10s │ %-9d │\n",
+            sb.append(String.format("│  %-3d │ %-12s │ %-10s │ %-10s │ %s %-7d │\n",
                     leaderBoardrow.getRank(),
                     leaderBoardrow.getPlayerName(),
                     date,
                     leaderBoardrow.getDuration(),
+                    leaderBoardrow.getDifficulty().getName().charAt(0),
                     leaderBoardrow.getScore()));
 
             currentRank++;

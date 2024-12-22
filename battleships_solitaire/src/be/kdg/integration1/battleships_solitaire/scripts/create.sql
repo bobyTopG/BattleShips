@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS players
     DEFAULT CURRENT_DATE
     );
 
+ALTER TABLE players
+ADD COLUMN IF NOT EXISTS password VARCHAR(44);
+
 /* Creating the GAMES table */
 CREATE TABLE IF NOT EXISTS games
 (

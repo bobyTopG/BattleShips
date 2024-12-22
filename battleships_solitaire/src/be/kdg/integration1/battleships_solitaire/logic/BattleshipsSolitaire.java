@@ -29,6 +29,7 @@ public class BattleshipsSolitaire {
     public void start() {
         uiHandler.showStartScreen();
         player = persistenceController.fetchPlayer(uiHandler.askForPlayerName());
+        player.authorize();
         uiHandler.welcomePlayer(player);
         do {
             selectChoice();
@@ -49,7 +50,6 @@ public class BattleshipsSolitaire {
             }
             case "L", "LEADERBOARD", "3" -> {
                 uiHandler.showLeaderboard();
-                uiHandler.awaitEnter();
             }
             case "E", "EXIT", "Q", "QUIT", "4" -> {
                 uiHandler.setResponse("S");

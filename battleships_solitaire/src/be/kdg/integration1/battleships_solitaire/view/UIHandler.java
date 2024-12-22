@@ -33,4 +33,6 @@ public interface UIHandler {
     char chooseY(int limit);
     void endOfGame();
     boolean isUserSureToExit();
+    void askForPassword();
+    String askForNewPassword();
 }

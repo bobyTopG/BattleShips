@@ -2,7 +2,10 @@ package be.kdg.integration1.battleships_solitaire.logic;
 
 import org.postgresql.util.PGInterval;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.Base64;
 
 public final class Utility {
 
@@ -30,6 +33,23 @@ public final class Utility {
         for (int i = 0; i < n; i++) {
             action.run();
         }
+    }
+
+    // Hashes a password
+    public static String hashPassword(String password) {
+        if (password == null) { return null; }
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing password: ", e);
+        }
+    }
+
+    public static boolean validatePassword(String enteredPassword, String hashedPassword) {
+        if (enteredPassword == null) { return true; }
+        return hashPassword(enteredPassword).equals(hashedPassword);
     }
 
 }

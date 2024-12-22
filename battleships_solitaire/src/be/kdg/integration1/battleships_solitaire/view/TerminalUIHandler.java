@@ -389,4 +389,28 @@ public class TerminalUIHandler implements UIHandler {
         }
     }
 
+    @Override
+    public void askForPassword() {
+        prompt("Enter your password");
+    }
+
+    @Override
+    public String askForNewPassword() {
+        String password = null;
+        do {
+            prompt("Choose a password");
+            password = getResponse();
+            if (password.isEmpty()) {
+                break;
+            }
+            prompt("Repeat password");
+            if (response.equals(password)) {
+                System.out.println("Password created!");
+            } else {
+                System.out.println("Passwords do not match!");
+            }
+        } while (!response.equals(password));
+        return response.isEmpty() ? null : response;
+    }
+
 }

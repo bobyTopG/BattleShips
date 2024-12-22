@@ -28,12 +28,13 @@ public class PersistenceController {
     public PersistenceController() {
         try {
             connection = DriverManager.getConnection(URL + TABLE, USERNAME, PASSWORD);
-            createTables();
-            insertShipTypes();
             // System.out.println("There are " + getGameCount() + " saved game(s) in the database");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Couldn't connect to the database!");
+            System.exit(1);
         }
+        createTables();
+        insertShipTypes();
     }
 
     // executes all create table statements needed
@@ -55,7 +56,9 @@ public class PersistenceController {
                         CONSTRAINT ch_birthdate
                         CHECK ( birthdate < NOW() ),
                         join_date DATE DEFAULT CURRENT_DATE
-                        CONSTRAINT nn_join_date NOT NULL)
+                        CONSTRAINT nn_join_date NOT NULL);
+                        ALTER TABLE players
+                        ADD COLUMN IF NOT EXISTS password VARCHAR(44);
                     """);
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS games (
@@ -156,10 +159,11 @@ public class PersistenceController {
 
     public void savePlayer(Player player) {
         try {
-            String query = "INSERT INTO players (name, birthdate) VALUES (?, ?)";
+            String query = "INSERT INTO players (name, birthdate, password) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, player.getName());
             statement.setDate(2, Date.valueOf(player.getBirthdate()));
+            statement.setString(3, player.getPassword());
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
@@ -180,12 +184,17 @@ public class PersistenceController {
                         resultSet.getInt("player_id"),
                         resultSet.getString("name"),
                         resultSet.getDate("birthdate").toLocalDate(),
-                        resultSet.getDate("join_date").toLocalDate()
+                        resultSet.getDate("join_date").toLocalDate(),
+                        resultSet.getString("password")
                 );
             } else {
                 // if there isn't such a Player yet, we just create it
                 LocalDate birthdate = new TerminalUIHandler().askForBirthdate();
-                savePlayer(new Player(name, birthdate));
+                String password = new TerminalUIHandler().askForNewPassword();
+                if (password != null) {
+                    password = Utility.hashPassword(password);
+                }
+                savePlayer(new Player(name, birthdate, password));
                 return fetchPlayer(name);
             }
         } catch (SQLException e) {
@@ -206,7 +215,8 @@ public class PersistenceController {
                         resultSet.getInt("player_id"),
                         resultSet.getString("name"),
                         resultSet.getDate("birthdate").toLocalDate(),
-                        resultSet.getDate("join_date").toLocalDate()
+                        resultSet.getDate("join_date").toLocalDate(),
+                        resultSet.getString("password")
                 );
             } else {
                 return null;
@@ -468,9 +478,10 @@ public class PersistenceController {
                 String playerName = resultSet.getString(1);
                 Date gameDate = resultSet.getDate(2);
                 String duration = resultSet.getString(3);
-                int score = resultSet.getInt(4);
+                Difficulty difficulty = Difficulty.valueOf(resultSet.getInt(4));
+                int score = resultSet.getInt(5);
                 // creates a new row in the leaderboard
-                Leaderboard.LeaderboardRow row = this.leaderboard.new LeaderboardRow(playerName, gameDate, duration, score);
+                Leaderboard.LeaderboardRow row = this.leaderboard.new LeaderboardRow(playerName, gameDate, duration, difficulty, score);
                 // adds new row to the leaderboard, which can then be printed
                 this.leaderboard.addLeaderboardRow(row);
             }
@@ -482,7 +493,7 @@ public class PersistenceController {
 
     public Leaderboard loadLeaderBoard(int amount) {
 //        Leaderboard leaderboard = new Leaderboard();
-        String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+        String query = "SELECT p.name, g.end, g.duration, g.board_size, g.score FROM games g " +
                        "JOIN players p ON p.player_id = g.player_id ORDER BY g.score DESC FETCH FIRST ? ROWS ONLY";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -502,7 +513,7 @@ public class PersistenceController {
         this.leaderboard = new Leaderboard();
         try {
             name = name.toUpperCase();
-            String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+            String query = "SELECT p.name, g.end, g.duration, g.board_size, g.score FROM games g " +
                            "JOIN players p ON p.player_id = g.player_id  WHERE p.name = ? " +
                            "ORDER BY g.score DESC FETCH FIRST 5 ROWS ONLY";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -520,7 +531,7 @@ public class PersistenceController {
     public Leaderboard fetchLeaderboardDifficulty(int boardSize) {
         this.leaderboard = new Leaderboard();
         try {
-            String query = "SELECT p.name, g.end, g.duration, g.score FROM games g " +
+            String query = "SELECT p.name, g.end, g.duration, g.board_size, g.score FROM games g " +
                            "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? " +
                            "ORDER BY g.score DESC FETCH FIRST 5 ROWS ONLY";
             PreparedStatement statement = connection.prepareStatement(query);
