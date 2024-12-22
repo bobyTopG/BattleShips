@@ -17,24 +17,43 @@ import java.util.List;
  */
 public class PersistenceController {
 
-    public final String URL = "jdbc:postgresql://localhost:5432/";
+    public final boolean USE_SERVER_DATABASE = true;
+    public final String LOCAL_URL = "jdbc:postgresql://localhost:5432/";
+    public final String SERVER_URL = "jdbc:postgresql://10.134.177.18:5432/";
     public final String TABLE = "ascii2";
     public final String USERNAME = "postgres";
     public final String PASSWORD = "Student_1234";
 
-    private Connection connection;
+    private static Connection connection;
     private Leaderboard leaderboard = new Leaderboard();
 
     public PersistenceController() {
-        try {
-            connection = DriverManager.getConnection(URL + TABLE, USERNAME, PASSWORD);
-            // System.out.println("There are " + getGameCount() + " saved game(s) in the database");
-        } catch (SQLException e) {
-            System.err.println("Couldn't connect to the database!");
-            System.exit(1);
-        }
+        connectRemoteDatabase();
         createTables();
         insertShipTypes();
+    }
+
+    private void connectRemoteDatabase() {
+        if (connection != null) return;
+        if (USE_SERVER_DATABASE) {
+            try {
+                connection = DriverManager.getConnection(SERVER_URL + TABLE, USERNAME, PASSWORD);
+            } catch (SQLException e1) {
+                System.err.println("Couldn't connect to the remote database!");
+                connectLocalDatabase();
+            }
+        } else {
+            connectLocalDatabase();
+        }
+    }
+
+    private void connectLocalDatabase() {
+        try {
+            connection = DriverManager.getConnection(LOCAL_URL + TABLE, USERNAME, PASSWORD);
+        } catch (SQLException e2) {
+            System.err.println("Couldn't connect to a local database!");
+            System.exit(1);
+        }
     }
 
     // executes all create table statements needed
@@ -107,7 +126,8 @@ public class PersistenceController {
                           length NUMERIC(1)
                               CONSTRAINT nn_length NOT NULL,
                           name VARCHAR(12)
-                              CONSTRAINT nn_ship_name NOT NULL)
+                              CONSTRAINT nn_ship_name NOT NULL,
+                          CONSTRAINT uq_ship UNIQUE (length, name))
                     """);
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS ships (
