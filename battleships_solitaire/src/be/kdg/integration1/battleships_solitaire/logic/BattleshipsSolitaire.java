@@ -12,9 +12,8 @@ public class BattleshipsSolitaire {
 
     private Player player;
 
-    private GameSession gameSession;
-    private UIHandler uiHandler;
-    private PersistenceController persistenceController;
+    private final UIHandler uiHandler;
+    private final PersistenceController persistenceController;
 
     public BattleshipsSolitaire() {
         uiHandler = new TerminalUIHandler();
@@ -40,7 +39,7 @@ public class BattleshipsSolitaire {
         uiHandler.showMainMenu();
         switch (uiHandler.getResponse()) {
             case "P", "PLAY", "1" -> {
-                gameSession = new GameSession(player);
+                GameSession gameSession = new GameSession(player);
                 gameSession.startGame();
                 uiHandler.awaitEnter();
             }

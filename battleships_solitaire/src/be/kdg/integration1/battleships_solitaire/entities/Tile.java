@@ -34,8 +34,8 @@ public class Tile {
         }
     }
 
-    private int x;
-    private char y;
+    private final int x;
+    private final char y;
     /** If it is {@code null}, then the tile is unmarked.**/
     protected Type type;
     private Ship correspondingShip;

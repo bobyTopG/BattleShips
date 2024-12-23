@@ -33,7 +33,6 @@ public class PlayerTile extends Tile {
         return !type.isShip();
     }
 
-    /** @throws IllegalStateException */
     @Override
     public void markAs(Type type) {
         if (isRevealed)

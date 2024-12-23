@@ -157,7 +157,7 @@ public class PersistenceController {
                     
                     """);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Could not set up database properly!");
         }
     }
 
@@ -172,7 +172,6 @@ public class PersistenceController {
                 statement.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Ship Types could not be added to the database!");
         }
     }
@@ -187,7 +186,6 @@ public class PersistenceController {
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Could not save player in the database!");
         }
     }
@@ -218,31 +216,6 @@ public class PersistenceController {
                 return fetchPlayer(name);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Could not load player from the database!");
-        }
-        return null;
-    }
-
-    public Player fetchPlayer(int id) {
-        try {
-            String query = "SELECT * FROM players WHERE player_id = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new Player(
-                        resultSet.getInt("player_id"),
-                        resultSet.getString("name"),
-                        resultSet.getDate("birthdate").toLocalDate(),
-                        resultSet.getDate("join_date").toLocalDate(),
-                        resultSet.getString("password")
-                );
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Could not load player from the database!");
         }
         return null;
@@ -320,7 +293,6 @@ public class PersistenceController {
             }
         } catch (SQLException e) {
             System.err.println("Could not save tiles in the database!");
-            e.printStackTrace();
         }
     }
 
@@ -346,7 +318,6 @@ public class PersistenceController {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Could not save ships in the database!");
         }
     }
@@ -441,7 +412,6 @@ public class PersistenceController {
             }
         } catch (SQLException e) {
             System.err.println("Could not fetch tiles from the database!");
-            e.printStackTrace();
         }
         return tiles;
     }
@@ -484,12 +454,12 @@ public class PersistenceController {
             if (rs.next())
                 gameCount = rs.getInt(1);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error reading games from the database!");
         }
         return gameCount;
     }
 
-    // give resultset for fetch methods of the leaderboard
+    // give result set for fetch methods of the leaderboard
     public void fetchFromLeaderBoard(PreparedStatement statement) {
         this.leaderboard = new Leaderboard();
         try {
@@ -501,12 +471,11 @@ public class PersistenceController {
                 Difficulty difficulty = Difficulty.valueOf(resultSet.getInt(4));
                 int score = resultSet.getInt(5);
                 // creates a new row in the leaderboard
-                Leaderboard.LeaderboardRow row = this.leaderboard.new LeaderboardRow(playerName, gameDate, duration, difficulty, score);
+                Leaderboard.LeaderboardRow row = new Leaderboard.LeaderboardRow(playerName, gameDate, duration, difficulty, score);
                 // adds new row to the leaderboard, which can then be printed
                 this.leaderboard.addLeaderboardRow(row);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Data could not be retrieved from leaderboard!");
         }
     }
@@ -521,7 +490,6 @@ public class PersistenceController {
             fetchFromLeaderBoard(statement);
 
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Leaderboard could not be loaded!");
 
         }
@@ -541,7 +509,6 @@ public class PersistenceController {
             fetchFromLeaderBoard(statement);
 
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Player scores could not be retrieved!");
         }
         return this.leaderboard;
@@ -558,12 +525,9 @@ public class PersistenceController {
             statement.setInt(1, boardSize);
             fetchFromLeaderBoard(statement);
         } catch (SQLException e) {
-            e.printStackTrace();
             System.err.println("Leaderboard of difficulty could not be retrieved!");
         }
         return this.leaderboard;
     }
-
-
 
 }

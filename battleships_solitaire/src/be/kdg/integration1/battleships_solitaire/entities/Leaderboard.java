@@ -6,13 +6,13 @@ import java.util.*;
 
 public class Leaderboard {
 
-    public class LeaderboardRow {
+    public static class LeaderboardRow {
         private int rank;
-        private String playerName;
-        private Date gameDate;
-        private String duration;
-        private Difficulty difficulty;
-        private int score;
+        private final String playerName;
+        private final Date gameDate;
+        private final String duration;
+        private final Difficulty difficulty;
+        private final int score;
 
         public LeaderboardRow(String playerName, Date gameDate, String duration, Difficulty difficulty, int score) {
             this.playerName = playerName;
@@ -51,7 +51,7 @@ public class Leaderboard {
         }
     }
 
-    private List<LeaderboardRow> leaderboardRows;
+    private final List<LeaderboardRow> leaderboardRows;
     private int currentRank = 1;
 
     public void addLeaderboardRow(LeaderboardRow leaderBoardRow) {

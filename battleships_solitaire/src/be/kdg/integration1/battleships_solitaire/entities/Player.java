@@ -4,17 +4,15 @@ import be.kdg.integration1.battleships_solitaire.logic.Utility;
 import be.kdg.integration1.battleships_solitaire.view.TerminalUIHandler;
 import be.kdg.integration1.battleships_solitaire.view.UIHandler;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 public class Player {
 
     private int id;
     private String name;
     private LocalDate birthdate;
-    private LocalDate joindate;
-    private String password;
+    private LocalDate joinDate;
+    private final String password;
 
     public Player(String name, String password) {
         setName(name);
@@ -25,13 +23,13 @@ public class Player {
     public Player(String name, LocalDate birthdate, String password) {
         this(name, password);
         setBirthdate(birthdate);
-        setJoindate(LocalDate.now());
+        setJoinDate(LocalDate.now());
     }
 
-    public Player(int id, String name, LocalDate birthdate, LocalDate joindate, String password) {
+    public Player(int id, String name, LocalDate birthdate, LocalDate joinDate, String password) {
         this(name, birthdate, password);
         this.id = id;
-        setJoindate(joindate);
+        setJoinDate(joinDate);
     }
 
     public LocalDate getBirthdate() {
@@ -46,12 +44,12 @@ public class Player {
 
     }
 
-    public LocalDate getJoindate() {
-        return joindate;
+    public LocalDate getJoinDate() {
+        return joinDate;
     }
 
-    public void setJoindate(LocalDate joindate) {
-        this.joindate = joindate;
+    public void setJoinDate(LocalDate joinDate) {
+        this.joinDate = joinDate;
     }
 
     public String getName() {
@@ -84,7 +82,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format("'%s' joined on %s", name, joindate);
+        return String.format("'%s' joined on %s", name, joinDate);
     }
 
 }

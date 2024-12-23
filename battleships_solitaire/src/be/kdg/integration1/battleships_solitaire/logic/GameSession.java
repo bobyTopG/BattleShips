@@ -18,7 +18,7 @@ public class GameSession {
 
     private final Player player;
     private final Board board;
-    private Leaderboard leaderboard;
+
     private final UIHandler uiHandler;
     private final PersistenceController persistenceController;
 
@@ -122,34 +122,4 @@ public class GameSession {
             persistenceController.saveGame(player, board);
         }
     }
-
-
-//    public void loadLeaderBoard() {
-//         leaderboard = new Leaderboard();
-//
-////        // Create players
-////        Player player1 = new Player("Alice", 1);
-////        Player player2 = new Player("Bob", 2);
-////        Player player3 = new Player("Charlie", 3);
-////
-////        // Simulate players scoring
-////        player1.increaseScore(100);
-////        player2.increaseScore(200);
-////        player3.increaseScore(150);
-////
-////        // Add players to the leaderboard
-////        leaderboard.addPlayer(player1);
-////        leaderboard.addPlayer(player2);
-////        leaderboard.addPlayer(player3);
-//
-//        // Display the leaderboard
-//        leaderboard.displayLeaderboard();
-//
-//        // Get and display the top player
-//        Player topPlayer = leaderboard.getTopPlayer();
-//        if (topPlayer != null) {
-//            System.out.println("\nTop player: " + topPlayer.getName() + " with score: " /*+ topPlayer.getScore()*/);
-//        }
-//
-//    }
 }
