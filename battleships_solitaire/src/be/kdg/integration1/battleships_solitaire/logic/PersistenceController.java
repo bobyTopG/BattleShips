@@ -364,7 +364,8 @@ public class PersistenceController {
     public Board fetchGame(Player player) {
         try {
             // first getting the game itself
-            String gameQuery = "SELECT game_id, board_size, score, start, EXTRACT(EPOCH FROM duration) AS duration FROM games WHERE player_id = ? AND \"end\" IS NULL;";
+            String gameQuery = "SELECT game_id, board_size, score, start, EXTRACT(EPOCH FROM duration) " +
+                               "AS duration FROM games WHERE player_id = ? AND \"end\" IS NULL;";
             PreparedStatement statement = connection.prepareStatement(gameQuery);
             statement.setInt(1, player.getId());
             ResultSet resultSet = statement.executeQuery();
@@ -483,7 +484,8 @@ public class PersistenceController {
     public Leaderboard loadLeaderBoard(int amount) {
 //        Leaderboard leaderboard = new Leaderboard();
         String query = "SELECT p.name, g.end, g.duration, g.board_size, g.score FROM games g " +
-                       "JOIN players p ON p.player_id = g.player_id ORDER BY g.score DESC FETCH FIRST ? ROWS ONLY";
+                       "JOIN players p ON p.player_id = g.player_id WHERE g.end IS NOT NULL " +
+                       "ORDER BY g.score DESC FETCH FIRST ? ROWS ONLY";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, amount);
@@ -502,7 +504,7 @@ public class PersistenceController {
         try {
             name = name.toUpperCase();
             String query = "SELECT p.name, g.end, g.duration, g.board_size, g.score FROM games g " +
-                           "JOIN players p ON p.player_id = g.player_id  WHERE p.name = ? " +
+                           "JOIN players p ON p.player_id = g.player_id  WHERE p.name = ? AND g.end IS NOT NULL " +
                            "ORDER BY g.score DESC FETCH FIRST 5 ROWS ONLY";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, name);
@@ -519,7 +521,7 @@ public class PersistenceController {
         this.leaderboard = new Leaderboard();
         try {
             String query = "SELECT p.name, g.end, g.duration, g.board_size, g.score FROM games g " +
-                           "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? " +
+                           "JOIN players p ON p.player_id = g.player_id  WHERE g.board_size = ? AND g.end IS NOT NULL " +
                            "ORDER BY g.score DESC FETCH FIRST 5 ROWS ONLY";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, boardSize);
