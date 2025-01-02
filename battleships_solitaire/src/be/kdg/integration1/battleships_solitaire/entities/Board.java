@@ -32,10 +32,10 @@ public class Board {
             throw new IllegalArgumentException();
         this.boardSize = boardSize;
         this.shipAmount = Ship.getShipAmountByDifficulty(Difficulty.valueOf(boardSize));
-        System.out.print("Generating board ");
+        System.out.print("Generating board ...");
         generate();
         revealHints();
-        System.out.println(" .");
+//        System.out.println(" .");
         score = Difficulty.valueOf(boardSize).getStartingPoints();
     }
 
@@ -75,16 +75,16 @@ public class Board {
                 placeShip(newShipTiles);
                 ships.add(newShip);
                 shipTypes.removeFirst();
-                System.out.print(".");
+//                System.out.print(".");
                 attempts = 0;
             } else {
-                System.out.print("_");
+//                System.out.print("_");
                 attempts++;
             }
 
             // if it takes too many attempts just restart the generation process
             if (attempts >= MAX_ATTEMPTS) {
-                System.out.println(",");
+//                System.out.println(",");
                 generate();
                 break;
             }
