@@ -16,7 +16,6 @@ public class TerminalUIHandler implements UIHandler {
 
     private final Scanner scanner;
     private String response;
-    private final int NAME_MAX_CHARACTERS = 12;
     private final PersistenceController persistenceController;
 
     public TerminalUIHandler() {
@@ -116,6 +115,7 @@ public class TerminalUIHandler implements UIHandler {
     @Override
     public String askForPlayerName() {
         String name;
+        int NAME_MAX_CHARACTERS = 12;
         // validate the name by checking if it's either empty or contains characters that aren't letters
         // the regex is matching all lowercase and uppercase letters with at least 1 occurrence
         do {
@@ -244,7 +244,7 @@ public class TerminalUIHandler implements UIHandler {
                         ranks = Integer.parseInt(response);
                         if (ranks <= 0 || response.isEmpty()) {
                             System.out.println("Please enter a number higher than 0!");
-                        } else if (ranks > MAXIMUM_AMOUNT_ROWS){
+                        } else if (ranks > MAXIMUM_AMOUNT_ROWS) {
                             System.out.println("You may only select the top 25 scores!");
                         }
                     } catch (NumberFormatException e) {
@@ -285,14 +285,18 @@ public class TerminalUIHandler implements UIHandler {
                     }
                 } while (response.isEmpty());
                 switch (response) {
-                    case "EASY", "E", "5", "5x5" -> {
+                    case "EASY", "E", "5", "5X5", "1" -> {
                         boardSize = Difficulty.EASY.getBoardSize();
                     }
-                    case "MEDIUM", "M", "7", "7x7" -> {
+                    case "MEDIUM", "M", "7", "7X7", "2" -> {
                         boardSize = Difficulty.MEDIUM.getBoardSize();
                     }
-                    case "HARD", "H", "9", "9x9" -> {
+                    case "HARD", "H", "9", "9X9", "3" -> {
                         boardSize = Difficulty.HARD.getBoardSize();
+                    }
+                    default -> {
+                        System.out.println("Please select a valid option!");
+                        leaderboardChoice();
                     }
                 }
                 showLeaderboardType(boardSize);

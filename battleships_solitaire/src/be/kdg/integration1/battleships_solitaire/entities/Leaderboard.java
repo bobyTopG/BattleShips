@@ -7,7 +7,7 @@ import java.util.*;
 public class Leaderboard {
 
     public static class LeaderboardRow {
-        private int rank;
+        //private int rank;
         private final String playerName;
         private final Date gameDate;
         private final String duration;
@@ -42,13 +42,13 @@ public class Leaderboard {
             return difficulty;
         }
 
-        public int getRank() {
-            return rank;
-        }
-
-        public void setRank(int rank) {
-            this.rank = rank;
-        }
+//        public int getRank() {
+//            return rank;
+//        }
+//
+//        public void setRank(int rank) {
+//            this.rank = rank;
+//        }
     }
 
     private final List<LeaderboardRow> leaderboardRows;
@@ -77,20 +77,20 @@ public class Leaderboard {
         sb.append("├──────┼──────────────┼────────────┼────────────┼───────────┤\n");
 
         // add each row of the leaderboard to output
-        for (LeaderboardRow leaderBoardrow : leaderboardRows) {
+        for (LeaderboardRow leaderboardRow : leaderboardRows) {
             DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-            String date = formatter.format(leaderBoardrow.getGameDate());
-            leaderBoardrow.setRank(currentRank);
+            String date = formatter.format(leaderboardRow.getGameDate());
+            //leaderboardRow.setRank(currentRank);
 
             sb.append(String.format("│  %-3d │ %-12s │ %-10s │ %-10s │ %s %-7d │\n",
-                    leaderBoardrow.getRank(),
-                    leaderBoardrow.getPlayerName(),
+                    currentRank++,
+                    leaderboardRow.getPlayerName(),
                     date,
-                    leaderBoardrow.getDuration(),
-                    leaderBoardrow.getDifficulty().getName().charAt(0),
-                    leaderBoardrow.getScore()));
+                    leaderboardRow.getDuration(),
+                    leaderboardRow.getDifficulty().getName().charAt(0),
+                    leaderboardRow.getScore()));
 
-            currentRank++;
+            //currentRank++;
         }
         sb.append("└──────┴──────────────┴────────────┴────────────┴───────────┘");
 
