@@ -159,7 +159,7 @@ public class TerminalUIHandler implements UIHandler {
                 if (option < LOWEST_DIFFICULTY || option > HIGHEST_DIFFICULTY) {
                     System.out.printf("Invalid choice. Please select a difficulty between %d and %d.%n", LOWEST_DIFFICULTY, HIGHEST_DIFFICULTY);
                 }
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException | InputMismatchException e) {
                 System.out.printf("Invalid input. Please enter the difficulty using a number between %d and %d.%n", LOWEST_DIFFICULTY, HIGHEST_DIFFICULTY);
                 // remove the invalid input from the scanner, otherwise it keeps going on forever
             }
